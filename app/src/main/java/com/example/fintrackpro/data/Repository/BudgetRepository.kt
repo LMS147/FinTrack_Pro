@@ -1,49 +1,33 @@
 package com.example.fintrackpro.data.Repository
 
+import androidx.lifecycle.LiveData
 import com.example.fintrackpro.data.Dao.BudgetDao
-import com.example.fintrackpro.data.entity.Budget
-import kotlinx.coroutines.flow.Flow
+import com.example.fintrackpro.data.entity.BudgetEntity
 
 class BudgetRepository(private val budgetDao: BudgetDao) {
 
-
-    suspend fun saveBudget(budget: Budget): Long {
-        return budgetDao.insertBudget(budget)
+    fun getBudgetsByUser(userId: String): LiveData<List<BudgetEntity>> {
+        return budgetDao.getBudgetsByUser(userId)
     }
 
-    suspend fun updateBudget(budget: Budget) {
-        budgetDao.updateBudget(budget)
-    }
+    suspend fun insertBudget(budget: BudgetEntity) = budgetDao.insertBudget(budget)
 
-    suspend fun getBudgetForMonth(userId: Int, monthYear: String): Budget? {
-        return budgetDao.getBudgetForMonth(userId, monthYear)
-    }
+    suspend fun updateBudget(budget: BudgetEntity) = budgetDao.updateBudget(budget)
 
-    fun observeBudgetForMonth(userId: Int, monthYear: String): Flow<Budget?> {
-        return budgetDao.getBudgetForMonthFlow(userId, monthYear)
-    }
+    suspend fun deleteBudget(budget: BudgetEntity) = budgetDao.deleteBudget(budget)
 
-    fun getAllBudgetsForUser(userId: Int): Flow<List<Budget>> {
-        return budgetDao.getAllBudgetsForUser(userId)
-    }
+    suspend fun getBudgetById(budgetId: String) = budgetDao.getBudgetById(budgetId)
 
-    suspend fun upsertBudget(userId: Int, monthYear: String, minGoal: Double?, maxGoal: Double) {
-        val existing = getBudgetForMonth(userId, monthYear)
-        if (existing == null) {
-            val newBudget = Budget(
-                userId = userId,
-                monthYear = monthYear,
-                minSpendingGoal = minGoal,
-                maxSpendingGoal = maxGoal
-            )
-            saveBudget(newBudget)
-        } else {
-            val updated = existing.copy(
-                minSpendingGoal = minGoal,
-                maxSpendingGoal = maxGoal,
-                updatedAt = System.currentTimeMillis()
-            )
-            updateBudget(updated)
-        }
+    fun getBudgetByIdLive(budgetId: String): LiveData<BudgetEntity?> =
+        budgetDao.getBudgetByIdLive(budgetId)
+
+    suspend fun getActiveBudgetForCategory(
+        userId: String,
+        categoryId: String,
+        currentTime: Long
+    ) = budgetDao.getActiveBudgetForCategory(userId, categoryId, currentTime)
+
+    suspend fun updateBudgetSpent(budgetId: String, spent: Double) {
+        budgetDao.updateBudgetSpent(budgetId, spent, System.currentTimeMillis())
     }
 }

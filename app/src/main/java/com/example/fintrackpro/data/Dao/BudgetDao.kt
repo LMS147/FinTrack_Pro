@@ -1,28 +1,32 @@
 package com.example.fintrackpro.data.Dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
-import com.example.fintrackpro.data.entity.Budget
-import kotlinx.coroutines.flow.Flow
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.example.fintrackpro.data.entity.BudgetEntity
 
 @Dao
 interface BudgetDao {
-
-    @Insert
-    suspend fun insertBudget(budget: Budget): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBudget(budget: BudgetEntity): Long
 
     @Update
-    suspend fun updateBudget(budget: Budget)
+    suspend fun updateBudget(budget: BudgetEntity)
 
-    // Requirement 5: Retrieve min/max monthly goal for a user
-    @Query("SELECT * FROM budgets WHERE userId = :userId AND monthYear = :monthYear LIMIT 1")
-    suspend fun getBudgetForMonth(userId: Int, monthYear: String): Budget?
+    @Delete
+    suspend fun deleteBudget(budget: BudgetEntity)
 
-    @Query("SELECT * FROM budgets WHERE userId = :userId AND monthYear = :monthYear LIMIT 1")
-    fun getBudgetForMonthFlow(userId: Int, monthYear: String): Flow<Budget?>
+    @Query("SELECT * FROM budgets WHERE userId = :userId AND isActive = 1 ORDER BY createdAt DESC")
+    fun getBudgetsByUser(userId: String): LiveData<List<BudgetEntity>>
 
-    @Query("SELECT * FROM budgets WHERE userId = :userId ORDER BY monthYear DESC")
-    fun getAllBudgetsForUser(userId: Int): Flow<List<Budget>>
+    @Query("SELECT * FROM budgets WHERE budgetId = :budgetId")
+    suspend fun getBudgetById(budgetId: String): BudgetEntity?
+
+    @Query("SELECT * FROM budgets WHERE budgetId = :budgetId")
+    fun getBudgetByIdLive(budgetId: String): LiveData<BudgetEntity?>
+
+    @Query("SELECT * FROM budgets WHERE userId = :userId AND categoryId = :categoryId AND isActive = 1 AND endDate >= :currentTime LIMIT 1")
+    suspend fun getActiveBudgetForCategory(userId: String, categoryId: String, currentTime: Long): BudgetEntity?
+
+    @Query("UPDATE budgets SET spent = :spent, updatedAt = :timestamp WHERE budgetId = :budgetId")
+    suspend fun updateBudgetSpent(budgetId: String, spent: Double, timestamp: Long)
 }

@@ -12,7 +12,7 @@ data class ExpensePhoto(
     @PrimaryKey(autoGenerate = true)
     val photoId: Int = 0,
 
-    val expenseId: Int,                 // Foreign key to Transaction
+    val expenseId: String,                 // Foreign key to TransactionEntity
     val photoUri: Uri,                  // Local URI of the image file
     val caption: String? = null,
     val createdAt: Long = System.currentTimeMillis()
