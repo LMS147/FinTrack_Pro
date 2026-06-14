@@ -2,46 +2,37 @@ package com.example.fintrackpro.ui.dashboard
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.fintrackpro.data.entity.Transaction
+import com.example.fintrackpro.R
+import com.example.fintrackpro.data.entity.TransactionEntity
 import com.example.fintrackpro.databinding.ItemTransactionBinding
-import com.example.fintrackpro.utils.CurrencyFormatter
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.fintrackpro.utils.FormatUtils
 
 class RecentTransactionsAdapter(
-    private val transactions: List<Transaction>,
-    private val currencyCode: String = "ZAR"
+    private val transactions: List<TransactionEntity>,
+    private val currency: String
 ) : RecyclerView.Adapter<RecentTransactionsAdapter.TransactionViewHolder>() {
 
-    inner class TransactionViewHolder(
-        private val binding: ItemTransactionBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    class TransactionViewHolder(val binding: ItemTransactionBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(transaction: TransactionEntity, currency: String) {
+            binding.tvDescription.text = transaction.description
+            binding.tvCategory.text = transaction.categoryId
+            binding.tvAmount.text = FormatUtils.formatCurrency(transaction.amount, currency)
+            binding.tvDate.text = FormatUtils.formatDate(transaction.date)
 
-        fun bind(expense: Transaction) {
-            binding.tvDescription.text = expense.description
-            binding.tvCategory.text = expense.categoryId.toString() // Replace with category name if joined
-            binding.tvAmount.text = CurrencyFormatter.format(expense.amount, currencyCode)
-            binding.tvDate.text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(expense.date)
-
-            // Income/Transaction color
-            val color = if (expense.isIncome)
-                binding.root.context.getColor(com.example.fintrackpro.R.color.primary_green)
-            else
-                binding.root.context.getColor(com.example.fintrackpro.R.color.error_red)
-            binding.tvAmount.setTextColor(color)
+            val colorRes = if (transaction.type == "INCOME") R.color.primary_green else R.color.error_red
+            binding.tvAmount.setTextColor(ContextCompat.getColor(binding.root.context, colorRes))
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-        val binding = ItemTransactionBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
+        val binding = ItemTransactionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TransactionViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        holder.bind(transactions[position])
+        holder.bind(transactions[position], currency)
     }
 
     override fun getItemCount(): Int = transactions.size

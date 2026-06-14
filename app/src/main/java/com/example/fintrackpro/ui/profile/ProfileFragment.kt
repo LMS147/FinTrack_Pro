@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentProfileBinding
 import com.example.fintrackpro.ui.auth.LoginActivity
@@ -25,9 +26,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    private val userId: Int by lazy { SessionManager(requireContext()).getUserId() }
+    private val userId: String by lazy { SessionManager(requireContext()).getUserId() ?: "" }
     private val viewModel: ProfileViewModel by viewModels {
-        ProfileViewModelFactory(requireContext(), userId)
+        val app = requireActivity().application as FinTrackApp
+        ProfileViewModelFactory(app.userRepository, userId)
     }
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -57,15 +59,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.toggleNotifications(isChecked)
+            // viewModel.toggleNotifications(isChecked)
         }
 
         binding.switchBiometrics.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.toggleBiometrics(isChecked)
+            // viewModel.toggleBiometrics(isChecked)
         }
 
         binding.btnLogout.setOnClickListener {
-            // Clear session and go to Login
             SessionManager(requireContext()).clearSession()
             startActivity(Intent(requireContext(), LoginActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -76,10 +77,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.llEditProfile.setOnClickListener {
             showEditProfileDialog()
         }
-
-        binding.llChangePassword.setOnClickListener {
-            // Future: open ChangePasswordActivity
-        }
     }
 
     private fun observeState() {
@@ -88,17 +85,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 viewModel.uiState.collect { state ->
                     val user = state.user ?: return@collect
 
-                    binding.tvDisplayName.text = user.displayName ?: user.username
+                    binding.tvDisplayName.text = user.fullName
                     binding.tvEmail.text = user.email
-                    binding.tvCurrency.text = user.defaultCurrency ?: "ZAR"
-                    binding.switchNotifications.isChecked = user.notificationsEnabled
-                    binding.switchBiometrics.isChecked = user.biometricsEnabled
+                    binding.tvCurrency.text = user.defaultCurrency
+                    // binding.switchNotifications.isChecked = user.notificationsEnabled
 
-                    user.photoUrl?.let {
+                    user.profileImageUrl?.let {
                         try {
                             binding.ivAvatar.setImageURI(Uri.parse(it))
                         } catch (e: SecurityException) {
-                            // If we still get a security exception, fallback to default
                             binding.ivAvatar.setImageResource(R.drawable.ic_profile)
                         }
                     } ?: run {
@@ -118,8 +113,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         val etName = EditText(requireContext()).apply {
-            hint = "Display Name"
-            setText(user.displayName ?: user.username)
+            hint = "Full Name"
+            setText(user.fullName)
         }
         val etEmail = EditText(requireContext()).apply {
             hint = "Email"
@@ -141,7 +136,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private fun showCurrencyPicker() {
         val currencies = arrayOf("ZAR", "USD", "EUR")
-        // Get current value from the ViewModel state
         val current = viewModel.uiState.value.user?.defaultCurrency ?: "ZAR"
         val checkedItem = currencies.indexOf(current).coerceAtLeast(0)
 

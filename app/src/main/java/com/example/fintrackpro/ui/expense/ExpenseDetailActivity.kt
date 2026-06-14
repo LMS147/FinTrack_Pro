@@ -2,38 +2,35 @@ package com.example.fintrackpro.ui.expense
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.fintrackpro.data.entity.Transaction
-import com.example.fintrackpro.data.Repository.ExpenseRepository
+import com.example.fintrackpro.FinTrackApp
+import com.example.fintrackpro.data.entity.TransactionEntity
 import com.example.fintrackpro.databinding.ActivityExpenseDetailBinding
-import com.example.fintrackpro.utils.CurrencyFormatter
+import com.example.fintrackpro.utils.FormatUtils
 import kotlinx.coroutines.*
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class ExpenseDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExpenseDetailBinding
     private val scope = CoroutineScope(Dispatchers.Main + Job())
-    private var expenseId: Int = -1
+    private var expenseId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExpenseDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        expenseId = intent.getIntExtra("expenseId", -1)
-        if (expenseId == -1) finish()
+        expenseId = intent.getStringExtra("expenseId")
+        if (expenseId == null) finish()
 
-        val db = com.example.fintrackpro.data.FinTrackDatabase.getDatabase(this)
-        val repo = ExpenseRepository(db.expenseDao())
+        val app = application as FinTrackApp
 
         scope.launch {
-            val expense = repo.getExpenseById(expenseId)
-            val user = db.userDao().getUserById(expense?.userId ?: 1)
+            val expense = app.transactionRepository.getTransactionById(expenseId!!)
+            val user = if (expense != null) app.userRepository.getUserById(expense.userId) else null
             val currency = user?.defaultCurrency ?: "ZAR"
             
             expense?.let { displayExpense(it, currency) }
-            val photo = repo.getPhotoForExpense(expenseId)
+            val photo = app.transactionRepository.getPhotoForExpense(expenseId!!)
             if (photo != null) {
                 try {
                     binding.ivPhoto.setImageURI(photo.photoUri)
@@ -45,13 +42,11 @@ class ExpenseDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayExpense(transaction: Transaction, currency: String) {
+    private fun displayExpense(transaction: TransactionEntity, currency: String) {
         binding.tvDescription.text = transaction.description
-        binding.tvAmount.text = CurrencyFormatter.format(transaction.amount, currency)
-        binding.tvDate.text = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(transaction.date)
-        binding.tvStartTime.text = transaction.startTime ?: "N/A"
-        binding.tvEndTime.text = transaction.endTime ?: "N/A"
-        binding.tvCategory.text = "Category " + transaction.categoryId // could fetch name
+        binding.tvAmount.text = FormatUtils.formatCurrency(transaction.amount, currency)
+        binding.tvDate.text = FormatUtils.formatDate(transaction.date)
+        binding.tvCategory.text = transaction.categoryId
     }
 
     override fun onDestroy() {

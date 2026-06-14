@@ -1,27 +1,25 @@
 package com.example.fintrackpro.ui.budget
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.example.fintrackpro.data.entity.Budget
-import com.example.fintrackpro.data.Repository.AuthRepository
+import com.example.fintrackpro.data.entity.BudgetEntity
+import com.example.fintrackpro.data.Repository.UserRepository
 import com.example.fintrackpro.data.Repository.BudgetRepository
-import com.example.fintrackpro.data.Repository.ExpenseRepository
+import com.example.fintrackpro.data.Repository.TransactionRepository
+import com.example.fintrackpro.utils.FormatUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 class BudgetViewModel(
     private val budgetRepository: BudgetRepository,
-    private val expenseRepository: ExpenseRepository,
-    private val authRepository: AuthRepository,
-    private val userId: Int
+    private val transactionRepository: TransactionRepository,
+    private val userRepository: UserRepository,
+    private val userId: String
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BudgetUiState())
     val uiState: StateFlow<BudgetUiState> = _uiState.asStateFlow()
-
-    private val monthYear: String = getCurrentMonthYear()
 
     init {
         observeData()
@@ -29,21 +27,18 @@ class BudgetViewModel(
 
     private fun observeData() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.update { it.copy(isLoading = true) }
             
-            // Get date range for spending
-            val (startDate, endDate) = getMonthDateRange()
+            val (startDate, endDate) = FormatUtils.getMonthStartEnd()
             
-            // Observe budget, spending, and user changes
             combine(
-                budgetRepository.observeBudgetForMonth(userId, monthYear),
-                expenseRepository.observeTotalExpensesForPeriod(userId, startDate, endDate),
-                authRepository.getUserFlow(userId)
-            ) { budget, totalSpent, user ->
+                budgetRepository.getBudgetsByUser(userId).asFlow(),
+                transactionRepository.getTotalExpenses(userId, startDate, endDate).asFlow(),
+                userRepository.getUserByIdLive(userId).asFlow()
+            ) { budgets, totalSpent, user ->
                 BudgetUiState(
-                    budget = budget,
-                    totalSpent = totalSpent,
-                    monthYear = monthYear,
+                    budget = budgets.firstOrNull(), // Simplified for now
+                    totalSpent = totalSpent ?: 0.0,
                     currency = user?.defaultCurrency ?: "ZAR",
                     isLoading = false
                 )
@@ -53,39 +48,9 @@ class BudgetViewModel(
         }
     }
 
-    fun saveBudget(min: Double, max: Double) {
-        viewModelScope.launch {
-            budgetRepository.upsertBudget(userId, monthYear, min, max)
-        }
-    }
-
-    private fun getCurrentMonthYear(): String {
-        val cal = Calendar.getInstance()
-        return SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(cal.time)
-    }
-
-    private fun getMonthDateRange(): Pair<Date, Date> {
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.DAY_OF_MONTH, 1)
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-        val start = cal.time
-
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
-        cal.set(Calendar.HOUR_OF_DAY, 23)
-        cal.set(Calendar.MINUTE, 59)
-        cal.set(Calendar.SECOND, 59)
-        cal.set(Calendar.MILLISECOND, 999)
-        val end = cal.time
-        return Pair(start, end)
-    }
-
     data class BudgetUiState(
-        val budget: Budget? = null,
+        val budget: BudgetEntity? = null,
         val totalSpent: Double = 0.0,
-        val monthYear: String = "",
         val currency: String = "ZAR",
         val isLoading: Boolean = true
     )

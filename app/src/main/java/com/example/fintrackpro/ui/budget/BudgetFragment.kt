@@ -8,22 +8,22 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentBudgetBinding
-import com.example.fintrackpro.utils.CurrencyFormatter
+import com.example.fintrackpro.utils.FormatUtils
 import com.example.fintrackpro.utils.SessionManager
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class BudgetFragment : Fragment(R.layout.fragment_budget) {
 
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
 
-    private val userId: Int by lazy { SessionManager(requireContext()).getUserId() }
+    private val userId: String by lazy { SessionManager(requireContext()).getUserId() ?: "" }
     private val viewModel: BudgetViewModel by viewModels {
-        BudgetViewModelFactory(requireContext(), userId)
+        val app = requireActivity().application as FinTrackApp
+        BudgetViewModelFactory(app.budgetRepository, app.transactionRepository, app.userRepository, userId)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,30 +50,22 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
     private fun updateUi(state: BudgetViewModel.BudgetUiState) {
         if (state.isLoading) return
 
-        // Format month for display
-        try {
-            val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
-            val date = sdf.parse(state.monthYear)
-            val displayFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-            binding.tvMonth.text = displayFormat.format(date!!)
-        } catch (e: Exception) {
-            binding.tvMonth.text = state.monthYear
-        }
+        binding.tvMonth.text = "Monthly Budget" // Simple display for now
 
         val budget = state.budget
         val totalSpent = state.totalSpent
         val currency = state.currency
 
         if (budget != null) {
-            binding.tvMinGoal.text = CurrencyFormatter.format(budget.minSpendingGoal ?: 0.0, currency)
-            binding.tvMaxGoal.text = CurrencyFormatter.format(budget.maxSpendingGoal, currency)
+            // Adjusting based on new BudgetEntity fields: amount
+            binding.tvMinGoal.text = "—" // Min goal removed in new schema
+            binding.tvMaxGoal.text = FormatUtils.formatCurrency(budget.amount, currency)
 
-            // Spending progress
-            binding.tvSpendingLabel.text = "Spent: ${CurrencyFormatter.format(totalSpent, currency)} of ${CurrencyFormatter.format(budget.maxSpendingGoal, currency)}"
+            binding.tvSpendingLabel.text = "Spent: ${FormatUtils.formatCurrency(totalSpent, currency)} of ${FormatUtils.formatCurrency(budget.amount, currency)}"
 
-            val percent = if (budget.maxSpendingGoal > 0) (totalSpent / budget.maxSpendingGoal * 100).toInt().coerceIn(0, 100) else 0
+            val percent = if (budget.amount > 0) (totalSpent / budget.amount * 100).toInt().coerceIn(0, 100) else 0
             binding.progressBar.progress = percent
-            binding.tvPercentage.text = "$percent% of max goal"
+            binding.tvPercentage.text = "$percent% of budget"
         } else {
             binding.tvMinGoal.text = "—"
             binding.tvMaxGoal.text = "—"

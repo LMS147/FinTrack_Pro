@@ -1,21 +1,18 @@
 package com.example.fintrackpro.utils
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.fintrackpro.data.FinTrackDatabase
-import com.example.fintrackpro.data.Repository.AuthRepository
+import com.example.fintrackpro.data.Repository.UserRepository
 import com.example.fintrackpro.ui.auth.AuthViewModel
 
-class AuthViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-
+class AuthViewModelFactory(
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
-            val database = FinTrackDatabase.getDatabase(context)
-            val repository = AuthRepository(database.userDao())
-            val sessionManager = SessionManager(context)
             @Suppress("UNCHECKED_CAST")
-            return AuthViewModel(repository, sessionManager) as T
+            return AuthViewModel(userRepository, sessionManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

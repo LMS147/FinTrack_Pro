@@ -5,28 +5,26 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.fintrackpro.data.entity.Transaction
+import com.example.fintrackpro.data.entity.TransactionEntity
 import com.example.fintrackpro.databinding.ItemExpenseBinding
-import com.example.fintrackpro.utils.CurrencyFormatter
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.fintrackpro.utils.FormatUtils
 
 class ExpenseAdapter(
     private val currencyCode: String = "ZAR",
-    private val onItemClick: (Transaction) -> Unit
-) : ListAdapter<Transaction, ExpenseAdapter.ExpenseViewHolder>(DiffCallback) {
+    private val onItemClick: (TransactionEntity) -> Unit
+) : ListAdapter<TransactionEntity, ExpenseAdapter.ExpenseViewHolder>(DiffCallback) {
 
     inner class ExpenseViewHolder(private val binding: ItemExpenseBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(expense: Transaction) {
+        fun bind(expense: TransactionEntity) {
             binding.tvDescription.text = expense.description
-            binding.tvAmount.text = CurrencyFormatter.format(expense.amount, currencyCode)
-            binding.tvDate.text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(expense.date)
-            binding.tvCategory.text = "Category " + expense.categoryId 
+            binding.tvAmount.text = FormatUtils.formatCurrency(expense.amount, currencyCode)
+            binding.tvDate.text = FormatUtils.formatDate(expense.date)
+            binding.tvCategory.text = expense.categoryId 
             binding.ivPhoto.visibility = android.view.View.GONE 
 
-            val color = if (expense.isIncome)
+            val color = if (expense.type == "INCOME")
                 binding.root.context.getColor(com.example.fintrackpro.R.color.primary_green)
             else
                 binding.root.context.getColor(com.example.fintrackpro.R.color.error_red)
@@ -45,15 +43,15 @@ class ExpenseAdapter(
         holder.bind(getItem(position))
     }
 
-    companion object DiffCallback : DiffUtil.ItemCallback<Transaction>() {
-        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
-            return oldItem.expenseId == newItem.expenseId
+    companion object DiffCallback : DiffUtil.ItemCallback<TransactionEntity>() {
+        override fun areItemsTheSame(oldItem: TransactionEntity, newItem: TransactionEntity): Boolean {
+            return oldItem.transactionId == newItem.transactionId
         }
 
-        override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
+        override fun areContentsTheSame(oldItem: TransactionEntity, newItem: TransactionEntity): Boolean {
             return oldItem == newItem
         }
     }
 
-    fun getExpenseAt(position: Int): Transaction = getItem(position)
+    fun getExpenseAt(position: Int): TransactionEntity = getItem(position)
 }

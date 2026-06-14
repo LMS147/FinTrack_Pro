@@ -2,8 +2,8 @@ package com.example.fintrackpro.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fintrackpro.data.entity.User
-import com.example.fintrackpro.data.Repository.AuthRepository
+import com.example.fintrackpro.data.entity.UserEntity
+import com.example.fintrackpro.data.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
-    private val authRepository: AuthRepository,
-    private val userId: Int
+    private val userRepository: UserRepository,
+    private val userId: String
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -24,7 +24,7 @@ class ProfileViewModel(
 
     private fun loadUser() {
         viewModelScope.launch {
-            val user = authRepository.getUserById(userId)
+            val user = userRepository.getUserById(userId)
             _uiState.update { it.copy(user = user, isLoading = false) }
         }
     }
@@ -33,16 +33,16 @@ class ProfileViewModel(
         viewModelScope.launch {
             val currentUser = _uiState.value.user ?: return@launch
             val updated = currentUser.copy(defaultCurrency = currency)
-            authRepository.updateUser(updated)
+            userRepository.updateUser(updated)
             _uiState.update { it.copy(user = updated) }
         }
     }
 
-    fun updateProfile(displayName: String, email: String) {
+    fun updateProfile(fullName: String, email: String) {
         viewModelScope.launch {
             val currentUser = _uiState.value.user ?: return@launch
-            val updated = currentUser.copy(displayName = displayName, email = email)
-            authRepository.updateUser(updated)
+            val updated = currentUser.copy(fullName = fullName, email = email)
+            userRepository.updateUser(updated)
             _uiState.update { it.copy(user = updated) }
         }
     }
@@ -50,32 +50,14 @@ class ProfileViewModel(
     fun updateProfilePicture(uri: String) {
         viewModelScope.launch {
             val currentUser = _uiState.value.user ?: return@launch
-            val updated = currentUser.copy(photoUrl = uri)
-            authRepository.updateUser(updated)
-            _uiState.update { it.copy(user = updated) }
-        }
-    }
-
-    fun toggleNotifications(enabled: Boolean) {
-        viewModelScope.launch {
-            val currentUser = _uiState.value.user ?: return@launch
-            val updated = currentUser.copy(notificationsEnabled = enabled)
-            authRepository.updateUser(updated)
-            _uiState.update { it.copy(user = updated) }
-        }
-    }
-
-    fun toggleBiometrics(enabled: Boolean) {
-        viewModelScope.launch {
-            val currentUser = _uiState.value.user ?: return@launch
-            val updated = currentUser.copy(biometricsEnabled = enabled)
-            authRepository.updateUser(updated)
+            val updated = currentUser.copy(profileImageUrl = uri)
+            userRepository.updateUser(updated)
             _uiState.update { it.copy(user = updated) }
         }
     }
 
     data class ProfileUiState(
-        val user: User? = null,
+        val user: UserEntity? = null,
         val isLoading: Boolean = true
     )
 }

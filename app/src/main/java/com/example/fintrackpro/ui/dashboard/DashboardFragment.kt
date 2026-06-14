@@ -14,24 +14,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.databinding.FragmentDashboardBinding
 import com.example.fintrackpro.ui.expense.AddExpenseActivity
-import com.example.fintrackpro.utils.CurrencyFormatter
+import com.example.fintrackpro.utils.FormatUtils
 import com.example.fintrackpro.utils.SessionManager
 import kotlinx.coroutines.launch
-import com.example.fintrackpro.data.Repository.CategoryRepository
 
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
 
-    // In a real app, obtain userId from shared preferences or auth manager
-    private val userId: Int by lazy { SessionManager(requireContext()).getUserId() }
+    private val userId: String by lazy { SessionManager(requireContext()).getUserId() ?: "" }
 
-    // ViewModel factory – replace with proper DI if available
     private val viewModel: DashboardViewModel by viewModels {
-        DashboardViewModelFactory(requireContext(), userId)
+        val app = requireActivity().application as FinTrackApp
+        DashboardViewModelFactory(app.transactionRepository, app.userRepository, userId)
     }
 
     override fun onCreateView(
@@ -55,18 +54,10 @@ class DashboardFragment : Fragment() {
         setupRecyclerView()
         setupFab()
         observeUiState()
-
-        // Initialize repository to insert default categories
-        val database = com.example.fintrackpro.data.FinTrackDatabase.getDatabase(requireContext())
-        val categoryRepository = CategoryRepository(database.categoryDao())
-        viewLifecycleOwner.lifecycleScope.launch {
-            categoryRepository.insertDefaultCategories(userId)
-        }
     }
 
     private fun setupRecyclerView() {
         binding.rvRecentTransactions.layoutManager = LinearLayoutManager(requireContext())
-        // Adapter will be updated when data changes
     }
 
     private fun setupFab() {
@@ -98,18 +89,15 @@ class DashboardFragment : Fragment() {
         binding.contentView.visibility = View.VISIBLE
 
         state.errorMessage?.let {
-            // Show error in a snackbar or toast
             return
         }
 
         val currency = state.currency
 
-        // Update summary cards
-        binding.tvBalance.text = CurrencyFormatter.format(state.totalBalance, currency)
-        binding.tvIncome.text = CurrencyFormatter.format(state.totalIncome, currency)
-        binding.tvExpenses.text = CurrencyFormatter.format(state.totalExpenses, currency)
+        binding.tvBalance.text = FormatUtils.formatCurrency(state.totalBalance, currency)
+        binding.tvIncome.text = FormatUtils.formatCurrency(state.totalIncome, currency)
+        binding.tvExpenses.text = FormatUtils.formatCurrency(state.totalExpenses, currency)
 
-        // Update recent transactions
         if (state.recentTransactions.isEmpty()) {
             binding.tvEmptyState.visibility = View.VISIBLE
             binding.rvRecentTransactions.adapter = null
