@@ -1,57 +1,75 @@
 package com.example.fintrackpro.ui.budget
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.data.entity.BudgetEntity
-import com.example.fintrackpro.data.Repository.UserRepository
+import com.example.fintrackpro.data.entity.CategoryEntity
 import com.example.fintrackpro.data.Repository.BudgetRepository
-import com.example.fintrackpro.data.Repository.TransactionRepository
-import com.example.fintrackpro.utils.FormatUtils
-import kotlinx.coroutines.flow.*
+import com.example.fintrackpro.data.Repository.CategoryRepository
+import com.example.fintrackpro.utils.SessionManager
 import kotlinx.coroutines.launch
 
-class BudgetViewModel(
-    private val budgetRepository: BudgetRepository,
-    private val transactionRepository: TransactionRepository,
-    private val userRepository: UserRepository,
-    private val userId: String
-) : ViewModel() {
+class BudgetViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _uiState = MutableStateFlow(BudgetUiState())
-    val uiState: StateFlow<BudgetUiState> = _uiState.asStateFlow()
+    private val budgetRepository: BudgetRepository = (application as FinTrackApp).budgetRepository
+    private val categoryRepository: CategoryRepository = (application as FinTrackApp).categoryRepository
+    private val sessionManager = SessionManager(application)
 
-    init {
-        observeData()
-    }
+    private val userId: String = sessionManager.getUserId() ?: ""
 
-    private fun observeData() {
+    val budgets: LiveData<List<BudgetEntity>> = budgetRepository.getBudgetsByUser(userId)
+    val expenseCategories: LiveData<List<CategoryEntity>> = categoryRepository.getCategoriesByType(userId, "EXPENSE")
+
+    private val _saveState = MutableLiveData<SaveState>()
+    val saveState: LiveData<SaveState> = _saveState
+
+    fun addBudget(
+        categoryId: String,
+        categoryName: String,
+        amount: Double,
+        period: String,
+        startDate: Long,
+        endDate: Long,
+        alertThreshold: Int
+    ) {
+        _saveState.value = SaveState.Loading
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            
-            val (startDate, endDate) = FormatUtils.getMonthStartEnd()
-            
-            combine(
-                budgetRepository.getBudgetsByUser(userId).asFlow(),
-                transactionRepository.getTotalExpenses(userId, startDate, endDate).asFlow(),
-                userRepository.getUserByIdLive(userId).asFlow()
-            ) { budgets, totalSpent, user ->
-                BudgetUiState(
-                    budget = budgets.firstOrNull(), // Simplified for now
-                    totalSpent = totalSpent ?: 0.0,
-                    currency = user?.defaultCurrency ?: "ZAR",
-                    isLoading = false
+            try {
+                val budget = BudgetEntity(
+                    userId = userId,
+                    categoryId = categoryId,
+                    categoryName = categoryName,
+                    amount = amount,
+                    period = period,
+                    startDate = startDate,
+                    endDate = endDate,
+                    alertThreshold = alertThreshold
                 )
-            }.collect { state ->
-                _uiState.value = state
+                budgetRepository.insertBudget(budget)
+                _saveState.value = SaveState.Success
+            } catch (e: Exception) {
+                _saveState.value = SaveState.Error(e.message ?: "Failed to add budget")
             }
         }
     }
 
-    data class BudgetUiState(
-        val budget: BudgetEntity? = null,
-        val totalSpent: Double = 0.0,
-        val currency: String = "ZAR",
-        val isLoading: Boolean = true
-    )
+    fun deleteBudget(budget: BudgetEntity) {
+        viewModelScope.launch {
+            try {
+                budgetRepository.deleteBudget(budget)
+            } catch (e: Exception) {
+                _saveState.value = SaveState.Error(e.message ?: "Failed to delete budget")
+            }
+        }
+    }
+}
+
+sealed class SaveState {
+    object Loading : SaveState()
+    object Success : SaveState()
+    data class Error(val message: String) : SaveState()
 }

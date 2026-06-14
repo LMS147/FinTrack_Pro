@@ -1,22 +1,15 @@
 package com.example.fintrackpro.ui.auth
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.databinding.ActivityRegisterBinding
-import com.example.fintrackpro.utils.AuthViewModelFactory
-import com.example.fintrackpro.utils.SessionManager
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
-    private val viewModel: AuthViewModel by viewModels {
-        val app = application as FinTrackApp
-        AuthViewModelFactory(app.userRepository, SessionManager(this))
-    }
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +27,14 @@ class RegisterActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString()
             val confirmPassword = binding.etConfirmPassword.text.toString()
 
+            if (password != confirmPassword) {
+                binding.tvError.text = "Passwords do not match"
+                binding.tvError.visibility = android.view.View.VISIBLE
+                return@setOnClickListener
+            }
+
             hideKeyboard()
-            viewModel.register(
-                email = email,
-                password = password,
-                confirmPassword = confirmPassword,
-                fullName = fullName
-            )
+            viewModel.register(email, password, fullName)
         }
 
         binding.ibBack.setOnClickListener {
@@ -48,36 +42,28 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         binding.tvLogin.setOnClickListener {
-            finish() // Return to login
+            finish()
         }
     }
 
     private fun observeRegisterState() {
-        viewModel.registerState.observe(this) { state ->
+        viewModel.authState.observe(this) { state ->
             when (state) {
-                is RegisterState.Loading -> {
+                is AuthState.Loading -> {
                     binding.progressBar.visibility = android.view.View.VISIBLE
                     binding.btnRegister.isEnabled = false
                     binding.tvError.visibility = android.view.View.GONE
                 }
-                is RegisterState.Success -> {
+                is AuthState.Success -> {
                     binding.progressBar.visibility = android.view.View.GONE
-                    Toast.makeText(
-                        this,
-                        "Registration successful! Please login.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this, "Registration successful! Please login.", Toast.LENGTH_LONG).show()
                     finish()
                 }
-                is RegisterState.Error -> {
+                is AuthState.Error -> {
                     binding.progressBar.visibility = android.view.View.GONE
                     binding.btnRegister.isEnabled = true
                     binding.tvError.text = state.message
                     binding.tvError.visibility = android.view.View.VISIBLE
-                }
-                else -> {
-                    binding.progressBar.visibility = android.view.View.GONE
-                    binding.btnRegister.isEnabled = true
                 }
             }
         }

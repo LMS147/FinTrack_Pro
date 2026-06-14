@@ -12,26 +12,60 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinTrackPro" >
+
         <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.transaction.AddExpenseActivity" android:exported="false" />
-        <activity android:name=".ui.transaction.ExpenseDetailActivity" android:exported="false" />
-        <activity android:name=".ui.budget.SetBudgetActivity" android:exported="false" />
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.transactions.AddTransactionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.transactions.TransactionDetailsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.budgets.AddBudgetActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.budgets.BudgetDetailsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.accounts.AddAccountActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.reports.ReportsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.shared.SharedWalletActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.gamification.AchievementsActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

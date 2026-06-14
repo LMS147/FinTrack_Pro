@@ -1,93 +1,90 @@
 package com.example.fintrackpro.ui.budget
 
 import android.os.Bundle
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.SeekBar
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.fintrackpro.FinTrackApp
-import com.example.fintrackpro.data.entity.BudgetEntity
 import com.example.fintrackpro.databinding.ActivitySetBudgetBinding
 import com.example.fintrackpro.utils.FormatUtils
-import com.example.fintrackpro.utils.SessionManager
-import kotlinx.coroutines.*
 
 class SetBudgetActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySetBudgetBinding
-    private val scope = CoroutineScope(Dispatchers.Main + Job())
-    private val userId: String by lazy { SessionManager(this).getUserId() ?: "" }
-    private var currentCurrency: String = "ZAR"
+    private val viewModel: BudgetViewModel by viewModels()
+    private var selectedCategoryId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySetBudgetBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val app = application as FinTrackApp
+        setupCategoryDropdown()
+        setupSeekBar()
+        setupSaveButton()
+        observeSaveState()
+    }
 
-        // Load user settings
-        scope.launch {
-            val user = app.userRepository.getUserById(userId)
-            currentCurrency = user?.defaultCurrency ?: "ZAR"
-            
-            // Initial text update
-            binding.tvMinValue.text = FormatUtils.formatCurrency(binding.seekBarMin.progress.toDouble(), currentCurrency)
-            binding.tvMaxValue.text = FormatUtils.formatCurrency(binding.seekBarMax.progress.toDouble(), currentCurrency)
-        }
-
-        // Setup SeekBars
-        binding.seekBarMin.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val amount = progress.toDouble()
-                binding.tvMinValue.text = FormatUtils.formatCurrency(amount, currentCurrency)
+    private fun setupCategoryDropdown() {
+        viewModel.expenseCategories.observe(this) { categories ->
+            val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categories.map { it.name })
+            binding.actvCategory.setAdapter(adapter)
+            binding.actvCategory.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                selectedCategoryId = categories[position].categoryId
             }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.seekBarMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val amount = progress.toDouble()
-                binding.tvMaxValue.text = FormatUtils.formatCurrency(amount, currentCurrency)
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.btnSaveBudget.setOnClickListener {
-            val max = binding.seekBarMax.progress.toDouble()
-            if (max <= 0) {
-                return@setOnClickListener
-            }
-            saveBudget(max)
-        }
-
-        // Pre-load existing budget
-        scope.launch {
-            val budgets = app.budgetRepository.getBudgetsByUser(userId)
-            // Simplified for refactor
         }
     }
 
-    private fun saveBudget(amount: Double) {
-        scope.launch {
-            val app = application as FinTrackApp
+    private fun setupSeekBar() {
+        binding.seekBarMax.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.tvMaxValue.text = FormatUtils.formatCurrency(progress.toDouble())
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+    }
+
+    private fun setupSaveButton() {
+        binding.btnSaveBudget.setOnClickListener {
+            val amount = binding.seekBarMax.progress.toDouble()
+            if (amount <= 0) {
+                Toast.makeText(this, "Please set an amount", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (selectedCategoryId == null) {
+                Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val (start, end) = FormatUtils.getMonthStartEnd()
-            val newBudget = BudgetEntity(
-                userId = userId,
-                categoryId = "DEFAULT", // Placeholder
-                categoryName = "Overall",
+            viewModel.addBudget(
+                categoryId = selectedCategoryId!!,
+                categoryName = binding.actvCategory.text.toString(),
                 amount = amount,
                 period = "MONTHLY",
                 startDate = start,
-                endDate = end
+                endDate = end,
+                alertThreshold = 80
             )
-            app.budgetRepository.insertBudget(newBudget)
-            finish()
         }
     }
 
-    override fun onDestroy() {
-        scope.cancel()
-        super.onDestroy()
+    private fun observeSaveState() {
+        viewModel.saveState.observe(this) { state ->
+            when (state) {
+                is SaveState.Loading -> binding.btnSaveBudget.isEnabled = false
+                is SaveState.Success -> {
+                    Toast.makeText(this, "Budget saved", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                is SaveState.Error -> {
+                    binding.btnSaveBudget.isEnabled = true
+                    Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

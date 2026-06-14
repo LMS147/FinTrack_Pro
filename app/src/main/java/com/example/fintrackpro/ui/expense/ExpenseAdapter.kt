@@ -18,7 +18,7 @@ class ExpenseAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(expense: TransactionEntity) {
-            binding.tvDescription.text = expense.description
+            binding.tvDescription.text = expense.title
             binding.tvAmount.text = FormatUtils.formatCurrency(expense.amount, currencyCode)
             binding.tvDate.text = FormatUtils.formatDate(expense.date)
             binding.tvCategory.text = expense.categoryId 

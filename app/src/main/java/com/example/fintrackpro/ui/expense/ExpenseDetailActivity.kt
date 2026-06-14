@@ -43,7 +43,7 @@ class ExpenseDetailActivity : AppCompatActivity() {
     }
 
     private fun displayExpense(transaction: TransactionEntity, currency: String) {
-        binding.tvDescription.text = transaction.description
+        binding.tvDescription.text = transaction.title
         binding.tvAmount.text = FormatUtils.formatCurrency(transaction.amount, currency)
         binding.tvDate.text = FormatUtils.formatDate(transaction.date)
         binding.tvCategory.text = transaction.categoryId

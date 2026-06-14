@@ -7,11 +7,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentReportsBinding
 import com.example.fintrackpro.utils.FormatUtils
-import com.example.fintrackpro.utils.SessionManager
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,11 +19,7 @@ class ReportsFragment : Fragment(R.layout.fragment_reports) {
     private var _binding: FragmentReportsBinding? = null
     private val binding get() = _binding!!
 
-    private val userId: String by lazy { SessionManager(requireContext()).getUserId() ?: "" }
-    private val viewModel: ReportsViewModel by viewModels {
-        val app = requireActivity().application as FinTrackApp
-        ReportsViewModelFactory(app.transactionRepository, app.userRepository, app.budgetRepository, userId)
-    }
+    private val viewModel: ReportsViewModel by viewModels()
 
     private val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
@@ -33,12 +27,7 @@ class ReportsFragment : Fragment(R.layout.fragment_reports) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentReportsBinding.bind(view)
 
-        setupDateButtons()
         observeUiState()
-    }
-
-    private fun setupDateButtons() {
-        // Implementation for date buttons if needed
     }
 
     private fun observeUiState() {
@@ -55,7 +44,6 @@ class ReportsFragment : Fragment(R.layout.fragment_reports) {
                     } else {
                         binding.tvEmptyState.visibility = View.GONE
                         binding.rvCategoryBreakdown.visibility = View.VISIBLE
-                        // rv update
                     }
 
                     state.startDate?.let { binding.btnStartDate.text = dateFormatter.format(it) }

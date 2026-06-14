@@ -1,24 +1,26 @@
 package com.example.fintrackpro.ui.reports
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.data.entity.BudgetEntity
 import com.example.fintrackpro.data.entity.CategorySpendingSummary
-import com.example.fintrackpro.data.Repository.UserRepository
-import com.example.fintrackpro.data.Repository.BudgetRepository
-import com.example.fintrackpro.data.Repository.TransactionRepository
 import com.example.fintrackpro.utils.FormatUtils
+import com.example.fintrackpro.utils.SessionManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
-class ReportsViewModel(
-    private val transactionRepository: TransactionRepository,
-    private val userRepository: UserRepository,
-    private val budgetRepository: BudgetRepository,
-    private val userId: String
-) : ViewModel() {
+class ReportsViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val app = application as FinTrackApp
+    private val transactionRepository = app.transactionRepository
+    private val userRepository = app.userRepository
+    private val budgetRepository = app.budgetRepository
+    private val sessionManager = SessionManager(application)
+    private val userId: String = sessionManager.getUserId() ?: ""
 
     private val _uiState = MutableStateFlow(ReportsUiState())
     val uiState: StateFlow<ReportsUiState> = _uiState.asStateFlow()

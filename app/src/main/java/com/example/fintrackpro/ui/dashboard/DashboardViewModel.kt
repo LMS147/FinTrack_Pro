@@ -1,60 +1,51 @@
 package com.example.fintrackpro.ui.dashboard
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
-import com.example.fintrackpro.data.Repository.UserRepository
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import com.example.fintrackpro.FinTrackApp
+import com.example.fintrackpro.data.entity.AccountEntity
+import com.example.fintrackpro.data.entity.TransactionEntity
+import com.example.fintrackpro.data.Repository.AccountRepository
 import com.example.fintrackpro.data.Repository.TransactionRepository
 import com.example.fintrackpro.utils.FormatUtils
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import com.example.fintrackpro.utils.SessionManager
 
-class DashboardViewModel(
-    private val transactionRepository: TransactionRepository,
-    private val userRepository: UserRepository,
-    private val userId: String
-) : ViewModel() {
+class DashboardViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _uiState = MutableStateFlow(DashboardUiState())
-    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+    private val accountRepository: AccountRepository = (application as FinTrackApp).accountRepository
+    private val transactionRepository: TransactionRepository = (application as FinTrackApp).transactionRepository
+    private val sessionManager = SessionManager(application)
 
-    init {
-        loadDashboardData()
-    }
+    private val userId: String = sessionManager.getUserId() ?: ""
 
-    private fun loadDashboardData() {
-        viewModelScope.launch {
-            val (start, end) = FormatUtils.getMonthStartEnd()
-            
-            combine(
-                transactionRepository.getTotalIncome(userId, start, end).asFlow(),
-                transactionRepository.getTotalExpenses(userId, start, end).asFlow(),
-                transactionRepository.getRecentTransactions(userId, 5).asFlow(),
-                userRepository.getUserByIdLive(userId).asFlow()
-            ) { income, expenses, transactions, user ->
-                val incomeValue = income ?: 0.0
-                val expenseValue = expenses ?: 0.0
-                DashboardUiState(
-                    totalBalance = incomeValue - expenseValue,
-                    totalIncome = incomeValue,
-                    totalExpenses = expenseValue,
-                    recentTransactions = transactions,
-                    currency = user?.defaultCurrency ?: "ZAR",
-                    isLoading = false
-                )
-            }.catch { e ->
-                _uiState.value = DashboardUiState(
-                    isLoading = false,
-                    errorMessage = "Failed to load dashboard: ${e.message}"
-                )
-            }.collect { state ->
-                _uiState.value = state
-            }
+    val accounts: LiveData<List<AccountEntity>> = accountRepository.getAccountsByUser(userId)
+    val totalBalance: LiveData<Double?> = accountRepository.getTotalBalance(userId)
+    val recentTransactions: LiveData<List<TransactionEntity>> = transactionRepository.getRecentTransactions(userId, 10)
+
+    private val monthRange = FormatUtils.getMonthStartEnd()
+    val monthlyIncome: LiveData<Double?> = transactionRepository.getTotalIncome(userId, monthRange.first, monthRange.second)
+    val monthlyExpenses: LiveData<Double?> = transactionRepository.getTotalExpenses(userId, monthRange.first, monthRange.second)
+
+    val netWorth: MediatorLiveData<Double> = MediatorLiveData<Double>().apply {
+        addSource(totalBalance) { balance ->
+            value = balance ?: 0.0
         }
     }
 
-    fun refresh() {
-        _uiState.value = DashboardUiState(isLoading = true)
-        loadDashboardData()
+    val monthlySavings: MediatorLiveData<Double> = MediatorLiveData<Double>().apply {
+        var income = 0.0
+        var expenses = 0.0
+
+        addSource(monthlyIncome) { 
+            income = it ?: 0.0
+            value = income - expenses
+        }
+
+        addSource(monthlyExpenses) { 
+            expenses = it ?: 0.0
+            value = income - expenses
+        }
     }
 }

@@ -6,17 +6,10 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.lifecycleScope
-import com.example.fintrackpro.FinTrackApp
-import com.example.fintrackpro.data.entity.TransactionEntity
-import com.example.fintrackpro.data.entity.ExpensePhoto
 import com.example.fintrackpro.databinding.ActivityAddExpenseBinding
 import com.example.fintrackpro.utils.FileUtils
-import com.example.fintrackpro.utils.SessionManager
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,7 +19,8 @@ class AddExpenseActivity : AppCompatActivity() {
     private var selectedPhotoUri: Uri? = null
     private var selectedCategoryId: String? = null
     private var selectedDate: Long = System.currentTimeMillis()
-    private val userId: String by lazy { SessionManager(this).getUserId() ?: "" }
+
+    private val viewModel: TransactionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,13 +31,12 @@ class AddExpenseActivity : AppCompatActivity() {
         setupDatePickers()
         setupPhotoCapture()
         setupSaveButton()
+        observeSaveState()
     }
 
     private fun setupCategoryDropdown() {
-        val app = application as FinTrackApp
-        lifecycleScope.launch {
-            val categories = app.categoryRepository.getAllCategories(userId).asFlow().first()
-            val adapter = ArrayAdapter(this@AddExpenseActivity, android.R.layout.simple_dropdown_item_1line, categories.map { it.name })
+        viewModel.expenseCategories.observe(this) { categories ->
+            val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categories.map { it.name })
             binding.actvCategory.setAdapter(adapter)
             binding.actvCategory.setOnItemClickListener { _, _, position, _ ->
                 selectedCategoryId = categories[position].categoryId
@@ -95,7 +88,6 @@ class AddExpenseActivity : AppCompatActivity() {
     }
 
     private fun setupSaveButton() {
-        val app = application as FinTrackApp
         binding.btnSave.setOnClickListener {
             val amount = binding.etAmount.text.toString().toDoubleOrNull()
             if (amount == null || amount <= 0) {
@@ -106,28 +98,37 @@ class AddExpenseActivity : AppCompatActivity() {
                 binding.tilCategory.error = "Select a category"
                 return@setOnClickListener
             }
-            val description = binding.etDescription.text.toString().trim()
-            if (description.isEmpty()) {
-                binding.tilDescription.error = "Enter description"
+            val title = binding.etDescription.text.toString().trim() // Using as title
+            if (title.isEmpty()) {
+                binding.tilDescription.error = "Enter title"
                 return@setOnClickListener
             }
 
-            val transaction = TransactionEntity(
-                userId = userId,
-                accountId = "DEFAULT", // Placeholder
+            viewModel.addTransaction(
+                accountId = "DEFAULT",
                 categoryId = selectedCategoryId!!,
-                amount = amount,
-                description = description,
                 type = if (binding.chipIncome.isChecked) "INCOME" else "EXPENSE",
-                date = selectedDate
+                amount = amount,
+                title = title,
+                description = "",
+                date = selectedDate,
+                receiptImagePath = selectedPhotoUri?.toString()
             )
-            lifecycleScope.launch {
-                val expenseId = app.transactionRepository.insertTransaction(transaction).toString()
-                selectedPhotoUri?.let { uri ->
-                    app.transactionRepository.insertPhoto(ExpensePhoto(expenseId = expenseId, photoUri = uri))
+        }
+    }
+
+    private fun observeSaveState() {
+        viewModel.saveState.observe(this) { state ->
+            when (state) {
+                is SaveState.Loading -> binding.btnSave.isEnabled = false
+                is SaveState.Success -> {
+                    Toast.makeText(this, "Transaction saved", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
-                Toast.makeText(this@AddExpenseActivity, "Transaction saved", Toast.LENGTH_SHORT).show()
-                finish()
+                is SaveState.Error -> {
+                    binding.btnSave.isEnabled = true
+                    Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
