@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    tools:context=".ui.dashboard.DashboardFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top Bar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary_blue"
+            android:elevation="4dp"
+            app:title="@string/dashboard"
+            app:titleTextColor="@android:color/white"
+            app:menu="@menu/main_menu" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+            <include layout="@layout/shimmer_dashboard" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <!-- Scrollable Content -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/contentView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Summary Cards Row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
+
+                    <!-- Total Balance Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/balance"
+                                android:textColor="?attr/colorOnPrimary"
+                                android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+
+                            <TextView
+                                android:id="@+id/tvBalance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                                android:textColor="?attr/colorOnPrimary"
+                                android:textStyle="bold"
+                                tools:text="R 3,250.00" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Net Worth (optional) / Income card placeholder -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/income"
+                                android:textColor="?attr/colorOnSecondaryContainer"
+                                android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+
+                            <TextView
+                                android:id="@+id/tvIncome"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                                android:textColor="?attr/colorOnSecondaryContainer"
+                                android:textStyle="bold"
+                                tools:text="R 5,000.00" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- Expenses Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="12dp"
+                    app:cardBackgroundColor="?attr/colorErrorContainer"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/expenses"
+                            android:textColor="?attr/colorOnErrorContainer"
+                            android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+
+                        <TextView
+                            android:id="@+id/tvExpenses"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                            android:textColor="?attr/colorOnErrorContainer"
+                            android:textStyle="bold"
+                            tools:text="R 1,750.00" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Recent Transactions Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/recent_transactions"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textStyle="bold" />
+
+                <!-- Recent Transactions RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvRecentTransactions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_transaction" />
+
+                <!-- Error/Empty State -->
+                <TextView
+                    android:id="@+id/tvEmptyState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/no_transactions"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+
+    <!-- Floating Action Button to add transaction -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddExpense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/add_expense"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/primary_blue" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

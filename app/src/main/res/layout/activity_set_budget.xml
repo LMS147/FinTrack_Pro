@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/background_light"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_marginBottom="32dp"
+            android:text="@string/set_monthly_budget"
+            android:textStyle="bold" />
+
+        <!-- Minimum goal -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:text="@string/minimum_spending_goal" />
+        <TextView
+            android:id="@+id/tvMinValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_marginTop="4dp"
+            android:textStyle="bold"
+            tools:text="R 1,000" />
+
+        <SeekBar
+            android:id="@+id/seekBarMin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:max="10000"
+            android:progress="0" />
+
+        <!-- Maximum goal -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_marginTop="24dp"
+            android:text="@string/maximum_spending_goal" />
+        <TextView
+            android:id="@+id/tvMaxValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_marginTop="4dp"
+            android:textStyle="bold"
+            tools:text="R 4,000" />
+
+        <SeekBar
+            android:id="@+id/seekBarMax"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:max="20000"
+            android:progress="0" />
+
+        <!-- Save button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveBudget"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="40dp"
+            android:text="@string/save_budget"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

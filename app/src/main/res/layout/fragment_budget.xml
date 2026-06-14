@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:context=".ui.budget.BudgetFragment">
+
+    <!-- Month title -->
+    <TextView
+        android:id="@+id/tvMonth"
+        style="@style/TextAppearance.Material3.HeadlineSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        tools:text="April 2026" />
+
+    <!-- Budget card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:contentPadding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Goal summary -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:text="@string/min_goal" />
+                    <TextView
+                        android:id="@+id/tvMinGoal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:textStyle="bold"
+                        tools:text="R 1,000" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:text="@string/max_goal" />
+                    <TextView
+                        android:id="@+id/tvMaxGoal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:textStyle="bold"
+                        tools:text="R 4,000" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Spending progress -->
+            <TextView
+                android:id="@+id/tvSpendingLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/text_secondary"
+                tools:text="Spent: R 2,350 of R 4,000" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginTop="8dp"
+                android:max="100"
+                android:progress="0"
+                app:trackColor="@color/background_light"
+                android:progressTint="@color/primary_blue" />
+
+            <!-- Percentage text -->
+            <TextView
+                android:id="@+id/tvPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.Material3.LabelSmall"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/text_secondary"
+                tools:text="58% of max goal" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Action button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSetBudget"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/set_budget"
+        app:cornerRadius="12dp" />
+
+</LinearLayout>

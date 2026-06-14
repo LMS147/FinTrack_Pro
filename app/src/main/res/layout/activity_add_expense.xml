@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.transaction.AddExpenseActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            style="@style/TextAppearance.Material3.HeadlineSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_expense"
+            android:textStyle="bold" />
+
+        <!-- Amount -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilAmount"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:hint="@string/amount"
+            app:startIconDrawable="@drawable/ic_currency">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Description -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDescription"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/description"
+            app:startIconDrawable="@drawable/ic_description">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Category Dropdown -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCategory"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/category">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Date -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDate"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/date"
+            app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/ic_calendar">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Start Time -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilStartTime"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/start_time"
+            app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/ic_time">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etStartTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- End Time (optional) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEndTime"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/end_time"
+            app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/ic_time"
+            app:helperText="Optional">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEndTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Type toggle: Transaction / Income -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:checkedChip="@id/chipExpense"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipExpense"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transaction" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipIncome"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/income" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ExpensePhoto Section -->
+        <TextView
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/attach_photo" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnCamera"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/take_photo"
+                android:src="@drawable/ic_camera" />
+
+            <ImageButton
+                android:id="@+id/btnGallery"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@string/choose_from_gallery"
+                android:src="@drawable/ic_gallery" />
+
+            <ImageView
+                android:id="@+id/ivPreview"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="24dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                app:cornerRadius="8dp"
+                tools:src="@tools:sample/avatars"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <!-- Save Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="@string/save"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
