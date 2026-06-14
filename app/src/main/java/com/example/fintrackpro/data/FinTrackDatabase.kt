@@ -110,7 +110,9 @@ abstract class FinTrackDatabase : RoomDatabase() {
                 CurrencyRateEntity(fromCurrency = "USD", toCurrency = "CAD", rate = 1.36),
                 CurrencyRateEntity(fromCurrency = "EUR", toCurrency = "USD", rate = 1.09),
                 CurrencyRateEntity(fromCurrency = "GBP", toCurrency = "USD", rate = 1.27),
-                CurrencyRateEntity(fromCurrency = "INR", toCurrency = "USD", rate = 0.012)
+                CurrencyRateEntity(fromCurrency = "INR", toCurrency = "USD", rate = 0.012),
+                CurrencyRateEntity(fromCurrency = "ZAR", toCurrency = "USD", rate = 0.061),
+                CurrencyRateEntity(fromCurrency = "USD", toCurrency = "ZAR", rate = 16.31)
             )
             currencyRateDao.insertCurrencyRates(defaultRates)
         }
