@@ -1,10 +1,7 @@
-package com.example.fintrackpro.ui.expense
+package com.example.fintrackpro.ui.transactions
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.data.entity.AccountEntity
 import com.example.fintrackpro.data.entity.CategoryEntity
@@ -25,12 +22,25 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     private val budgetRepository: BudgetRepository = app.budgetRepository
     private val sessionManager = SessionManager(application)
 
-    private val userId: String = sessionManager.getUserId() ?: ""
+    private val _userId = MutableLiveData<String>().apply {
+        value = sessionManager.getUserId() ?: ""
+    }
 
-    val transactions: LiveData<List<TransactionEntity>> = transactionRepository.getTransactionsByUser(userId)
-    val accounts: LiveData<List<AccountEntity>> = accountRepository.getAccountsByUser(userId)
-    val expenseCategories: LiveData<List<CategoryEntity>> = categoryRepository.getCategoriesByType(userId, "EXPENSE")
-    val incomeCategories: LiveData<List<CategoryEntity>> = categoryRepository.getCategoriesByType(userId, "INCOME")
+    val transactions: LiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>> = _userId.switchMap { id ->
+        transactionRepository.getTransactionsByUser(id)
+    }
+
+    val accounts: LiveData<List<AccountEntity>> = _userId.switchMap { id ->
+        accountRepository.getAccountsByUser(id)
+    }
+
+    val expenseCategories: LiveData<List<CategoryEntity>> = _userId.switchMap { id ->
+        categoryRepository.getCategoriesByType(id, "EXPENSE")
+    }
+
+    val incomeCategories: LiveData<List<CategoryEntity>> = _userId.switchMap { id ->
+        categoryRepository.getCategoriesByType(id, "INCOME")
+    }
 
     private val _saveState = MutableLiveData<SaveState>()
     val saveState: LiveData<SaveState> = _saveState
@@ -45,11 +55,12 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         date: Long,
         receiptImagePath: String?
     ) {
+        val currentUserId = _userId.value ?: return
         _saveState.value = SaveState.Loading
         viewModelScope.launch {
             try {
                 val transaction = TransactionEntity(
-                    userId = userId,
+                    userId = currentUserId,
                     accountId = accountId,
                     categoryId = categoryId,
                     type = type,
@@ -61,7 +72,6 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
                 )
                 transactionRepository.insertTransaction(transaction)
 
-                // Update account balance
                 val account = accountRepository.getAccountById(accountId)
                 if (account != null) {
                     val newBalance = if (type == "INCOME") {
@@ -72,9 +82,8 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
                     accountRepository.updateAccountBalance(accountId, newBalance)
                 }
 
-                // Update budget spent if expense
                 if (type == "EXPENSE") {
-                    updateBudgetSpent(categoryId, amount)
+                    updateBudgetSpent(currentUserId, categoryId, amount)
                 }
 
                 _saveState.value = SaveState.Success
@@ -89,7 +98,6 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
             try {
                 transactionRepository.deleteTransaction(transaction)
 
-                // Revert account balance
                 val account = accountRepository.getAccountById(transaction.accountId)
                 if (account != null) {
                     val newBalance = if (transaction.type == "INCOME") {
@@ -105,7 +113,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    private suspend fun updateBudgetSpent(categoryId: String, amount: Double) {
+    private suspend fun updateBudgetSpent(userId: String, categoryId: String, amount: Double) {
         val budget = budgetRepository.getActiveBudgetForCategory(
             userId,
             categoryId,

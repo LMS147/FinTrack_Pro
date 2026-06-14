@@ -1,9 +1,7 @@
 package com.example.fintrackpro.ui.dashboard
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.*
 import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.data.entity.AccountEntity
 import com.example.fintrackpro.data.entity.TransactionEntity
@@ -18,15 +16,31 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val transactionRepository: TransactionRepository = (application as FinTrackApp).transactionRepository
     private val sessionManager = SessionManager(application)
 
-    private val userId: String = sessionManager.getUserId() ?: ""
+    private val _userId = MutableLiveData<String>().apply {
+        value = sessionManager.getUserId() ?: ""
+    }
 
-    val accounts: LiveData<List<AccountEntity>> = accountRepository.getAccountsByUser(userId)
-    val totalBalance: LiveData<Double?> = accountRepository.getTotalBalance(userId)
-    val recentTransactions: LiveData<List<TransactionEntity>> = transactionRepository.getRecentTransactions(userId, 10)
+    val accounts: LiveData<List<AccountEntity>> = _userId.switchMap { id ->
+        accountRepository.getAccountsByUser(id)
+    }
+
+    val totalBalance: LiveData<Double?> = _userId.switchMap { id ->
+        accountRepository.getTotalBalance(id)
+    }
+
+    val recentTransactions: LiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>> = _userId.switchMap { id ->
+        transactionRepository.getRecentTransactions(id, 10)
+    }
 
     private val monthRange = FormatUtils.getMonthStartEnd()
-    val monthlyIncome: LiveData<Double?> = transactionRepository.getTotalIncome(userId, monthRange.first, monthRange.second)
-    val monthlyExpenses: LiveData<Double?> = transactionRepository.getTotalExpenses(userId, monthRange.first, monthRange.second)
+    
+    val monthlyIncome: LiveData<Double?> = _userId.switchMap { id ->
+        transactionRepository.getTotalIncome(id, monthRange.first, monthRange.second)
+    }
+
+    val monthlyExpenses: LiveData<Double?> = _userId.switchMap { id ->
+        transactionRepository.getTotalExpenses(id, monthRange.first, monthRange.second)
+    }
 
     val netWorth: MediatorLiveData<Double> = MediatorLiveData<Double>().apply {
         addSource(totalBalance) { balance ->

@@ -15,8 +15,9 @@ interface TransactionDao {
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)
 
+    @Transaction
     @Query("SELECT * FROM transactions WHERE userId = :userId ORDER BY date DESC, createdAt DESC")
-    fun getTransactionsByUser(userId: String): LiveData<List<TransactionEntity>>
+    fun getTransactionsByUser(userId: String): LiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>>
 
     @Query("SELECT * FROM transactions WHERE transactionId = :transactionId")
     suspend fun getTransactionById(transactionId: String): TransactionEntity?
@@ -45,8 +46,18 @@ interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transactions WHERE userId = :userId AND categoryId = :categoryId AND type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate")
     fun getExpensesByCategory(userId: String, categoryId: String, startDate: Long, endDate: Long): LiveData<Double?>
 
+    @Transaction
     @Query("SELECT * FROM transactions WHERE userId = :userId ORDER BY date DESC LIMIT :limit")
-    fun getRecentTransactions(userId: String, limit: Int): LiveData<List<TransactionEntity>>
+    fun getRecentTransactions(userId: String, limit: Int): LiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>>
+
+    @Query("""
+        SELECT c.name as name, SUM(t.amount) as total 
+        FROM transactions t 
+        INNER JOIN categories c ON t.categoryId = c.categoryId 
+        WHERE t.userId = :userId AND t.type = 'EXPENSE' AND t.date BETWEEN :startDate AND :endDate 
+        GROUP BY t.categoryId
+    """)
+    fun getCategorySpendingTotals(userId: String, startDate: Long, endDate: Long): LiveData<List<com.example.fintrackpro.data.entity.CategorySpendingSummary>>
 
     // ExpensePhoto management
     @Insert

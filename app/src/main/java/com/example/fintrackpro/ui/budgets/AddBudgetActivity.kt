@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fintrackpro.databinding.ActivityAddBudgetBinding
-import com.example.fintrackpro.ui.budget.BudgetViewModel
-import com.example.fintrackpro.ui.budget.SaveState
+import com.example.fintrackpro.ui.budgets.BudgetViewModel
+import com.example.fintrackpro.ui.budgets.SaveState
 import com.example.fintrackpro.utils.FormatUtils
 import java.util.*
 

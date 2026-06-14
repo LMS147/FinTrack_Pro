@@ -1,4 +1,4 @@
-package com.example.fintrackpro.ui.dashboard
+package com.example.fintrackpro.ui.transactions
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,7 +11,7 @@ import com.example.fintrackpro.data.entity.TransactionWithCategory
 import com.example.fintrackpro.databinding.ItemRecentTransactionBinding
 import com.example.fintrackpro.utils.FormatUtils
 
-class RecentTransactionAdapter : ListAdapter<TransactionWithCategory, RecentTransactionAdapter.ViewHolder>(
+class TransactionAdapter : ListAdapter<TransactionWithCategory, TransactionAdapter.ViewHolder>(
     TransactionDiffCallback()
 ) {
 
@@ -36,7 +36,6 @@ class RecentTransactionAdapter : ListAdapter<TransactionWithCategory, RecentTran
             binding.tvTitle.text = transaction.title
             binding.tvCategory.text = item.category.name
             binding.tvDate.text = FormatUtils.formatDate(transaction.date)
-            binding.tvAmount.text = FormatUtils.formatCurrency(transaction.amount)
 
             val color = if (transaction.type == "INCOME") {
                 ContextCompat.getColor(binding.root.context, R.color.primary_green)

@@ -1,4 +1,4 @@
-package com.example.fintrackpro.ui.account
+package com.example.fintrackpro.ui.accounts
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

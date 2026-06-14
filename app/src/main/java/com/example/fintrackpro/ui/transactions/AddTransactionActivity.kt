@@ -17,8 +17,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.ActivityAddTransactionBinding
-import com.example.fintrackpro.ui.expense.TransactionViewModel
-import com.example.fintrackpro.ui.expense.SaveState
+import com.example.fintrackpro.ui.transactions.TransactionViewModel
+import com.example.fintrackpro.ui.transactions.SaveState
 import com.example.fintrackpro.utils.FileUtils
 import java.util.*
 
@@ -182,26 +182,34 @@ class AddTransactionActivity : AppCompatActivity() {
         val accountPosition = binding.spinnerAccount.selectedItemPosition
         val categoryPosition = binding.spinnerCategory.selectedItemPosition
 
-        viewModel.accounts.value?.getOrNull(accountPosition)?.let { account ->
-            val categories = if (type == "EXPENSE") {
-                viewModel.expenseCategories.value
-            } else {
-                viewModel.incomeCategories.value
-            }
-
-            categories?.getOrNull(categoryPosition)?.let { category ->
-                viewModel.addTransaction(
-                    accountId = account.accountId,
-                    categoryId = category.categoryId,
-                    type = type,
-                    amount = amount,
-                    title = title,
-                    description = description.ifEmpty { null },
-                    date = selectedDate,
-                    receiptImagePath = receiptImagePath
-                )
-            }
+        val account = viewModel.accounts.value?.getOrNull(accountPosition)
+        if (account == null) {
+            Toast.makeText(this, "Please create an account first", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        val categories = if (type == "EXPENSE") {
+            viewModel.expenseCategories.value
+        } else {
+            viewModel.incomeCategories.value
+        }
+
+        val category = categories?.getOrNull(categoryPosition)
+        if (category == null) {
+            Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        viewModel.addTransaction(
+            accountId = account.accountId,
+            categoryId = category.categoryId,
+            type = type,
+            amount = amount,
+            title = title,
+            description = description.ifEmpty { null },
+            date = selectedDate,
+            receiptImagePath = receiptImagePath
+        )
     }
 
     private fun observeData() {

@@ -1,4 +1,4 @@
-package com.example.fintrackpro.ui.budget
+package com.example.fintrackpro.ui.budgets
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

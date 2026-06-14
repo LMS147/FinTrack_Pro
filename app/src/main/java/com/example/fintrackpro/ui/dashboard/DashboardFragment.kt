@@ -62,7 +62,14 @@ class DashboardFragment : Fragment() {
         }
 
         viewModel.recentTransactions.observe(viewLifecycleOwner) { transactions ->
-            transactionAdapter.submitList(transactions)
+            if (transactions.isNullOrEmpty()) {
+                binding.tvEmptyState.visibility = View.VISIBLE
+                binding.rvRecentTransactions.visibility = View.GONE
+            } else {
+                binding.tvEmptyState.visibility = View.GONE
+                binding.rvRecentTransactions.visibility = View.VISIBLE
+                transactionAdapter.submitList(transactions)
+            }
         }
     }
 

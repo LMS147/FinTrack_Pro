@@ -60,6 +60,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             if (result.isSuccess) {
                 val user = result.getOrNull()!!
                 sessionManager.saveUserId(user.userId)
+                
+                // Create a default account for the new user
+                val defaultAccount = com.example.fintrackpro.data.entity.AccountEntity(
+                    userId = user.userId,
+                    accountName = "Main Wallet",
+                    accountType = "CASH",
+                    balance = 0.0,
+                    currency = "ZAR",
+                    color = "#2196F3"
+                )
+                (getApplication() as com.example.fintrackpro.FinTrackApp).accountRepository.insertAccount(defaultAccount)
+
                 _authState.value = AuthState.Success(user)
             } else {
                 _authState.value = AuthState.Error(result.exceptionOrNull()?.message ?: "Registration failed")

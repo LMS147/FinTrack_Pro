@@ -7,23 +7,22 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.utils.ColorTemplate
 
 object PieChartManager {
 
     fun setupPieChart(pieChart: PieChart, data: List<CategorySpendingSummary>) {
         if (data.isEmpty()) {
             pieChart.clear()
-            pieChart.centerText = "No data"
+            pieChart.setNoDataText("No spending data available")
             return
         }
 
         val entries = data.map { PieEntry(it.total.toFloat(), it.name) }
         val dataSet = PieDataSet(entries, "")
         dataSet.colors = listOf(
-            R.color.primary_blue,
-            R.color.primary_green,
-            R.color.error_red,
+            R.color.primary,
+            R.color.secondary,
+            R.color.expense_red,
             R.color.purple_200,
             R.color.teal_200,
             R.color.orange

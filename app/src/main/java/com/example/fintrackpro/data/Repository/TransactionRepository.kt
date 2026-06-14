@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import com.example.fintrackpro.data.Dao.TransactionDao
 import com.example.fintrackpro.data.entity.TransactionEntity
 import com.example.fintrackpro.data.entity.ExpensePhoto
+import com.example.fintrackpro.data.entity.TransactionWithCategory
 
 class TransactionRepository(private val transactionDao: TransactionDao) {
 
-    fun getTransactionsByUser(userId: String): LiveData<List<TransactionEntity>> {
+    fun getTransactionsByUser(userId: String): LiveData<List<TransactionWithCategory>> {
         return transactionDao.getTransactionsByUser(userId)
     }
 
@@ -63,9 +64,12 @@ class TransactionRepository(private val transactionDao: TransactionDao) {
         return transactionDao.getExpensesByCategory(userId, categoryId, startDate, endDate)
     }
 
-    fun getRecentTransactions(userId: String, limit: Int = 10): LiveData<List<TransactionEntity>> {
+    fun getRecentTransactions(userId: String, limit: Int = 10): LiveData<List<TransactionWithCategory>> {
         return transactionDao.getRecentTransactions(userId, limit)
     }
+
+    fun getCategorySpendingTotals(userId: String, startDate: Long, endDate: Long) =
+        transactionDao.getCategorySpendingTotals(userId, startDate, endDate)
 
     // Photo support
     suspend fun insertPhoto(photo: ExpensePhoto) = transactionDao.insertPhoto(photo)

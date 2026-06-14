@@ -6,8 +6,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fintrackpro.databinding.ActivityAddAccountBinding
-import com.example.fintrackpro.ui.account.AccountViewModel
-import com.example.fintrackpro.ui.account.SaveState
+import com.example.fintrackpro.ui.accounts.AccountViewModel
+import com.example.fintrackpro.ui.accounts.SaveState
 
 class AddAccountActivity : AppCompatActivity() {
 

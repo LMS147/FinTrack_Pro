@@ -1,9 +1,7 @@
 package com.example.fintrackpro.ui.reports
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.data.entity.BudgetEntity
 import com.example.fintrackpro.data.entity.CategorySpendingSummary
@@ -20,7 +18,10 @@ class ReportsViewModel(application: Application) : AndroidViewModel(application)
     private val userRepository = app.userRepository
     private val budgetRepository = app.budgetRepository
     private val sessionManager = SessionManager(application)
-    private val userId: String = sessionManager.getUserId() ?: ""
+    
+    private val _userId = MutableLiveData<String>().apply {
+        value = sessionManager.getUserId() ?: ""
+    }
 
     private val _uiState = MutableStateFlow(ReportsUiState())
     val uiState: StateFlow<ReportsUiState> = _uiState.asStateFlow()
@@ -33,14 +34,22 @@ class ReportsViewModel(application: Application) : AndroidViewModel(application)
 
     private fun observeReport() {
         viewModelScope.launch {
-            _dateRange.flatMapLatest { (start, end) ->
+            combine(
+                _userId.asFlow(),
+                _dateRange
+            ) { id, range -> Pair(id, range) }.flatMapLatest { (id, range) ->
+                val (start, end) = range
                 combine(
-                    transactionRepository.getTotalExpenses(userId, start, end).asFlow(),
-                    budgetRepository.getBudgetsByUser(userId).asFlow(),
-                    userRepository.getUserByIdLive(userId).asFlow()
-                ) { totals, budgets, user ->
+                    transactionRepository.getTotalIncome(id, start, end).asFlow(),
+                    transactionRepository.getTotalExpenses(id, start, end).asFlow(),
+                    transactionRepository.getCategorySpendingTotals(id, start, end).asFlow(),
+                    budgetRepository.getBudgetsByUser(id).asFlow(),
+                    userRepository.getUserByIdLive(id).asFlow()
+                ) { income, expenses, categoryTotals, budgets, user ->
                     ReportsUiState(
-                        totalSpent = totals ?: 0.0,
+                        totalIncome = income ?: 0.0,
+                        totalSpent = expenses ?: 0.0,
+                        categoryTotals = categoryTotals ?: emptyList(),
                         startDate = Date(start),
                         endDate = Date(end),
                         currency = user?.defaultCurrency ?: "ZAR",
@@ -59,14 +68,19 @@ class ReportsViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun setDateRange(start: Long, end: Long) {
+        _dateRange.value = Pair(start, end)
+    }
+
     data class ReportsUiState(
-        val categoryTotals: List<CategorySpendingSummary> = emptyList(),
+        val totalIncome: Double = 0.0,
         val totalSpent: Double = 0.0,
+        val categoryTotals: List<CategorySpendingSummary> = emptyList(),
         val startDate: Date? = null,
         val endDate: Date? = null,
         val currency: String = "ZAR",
         val budget: BudgetEntity? = null,
-        val isLoading: Boolean = false,
+        val isLoading: Boolean = true,
         val error: String? = null
     )
 }
