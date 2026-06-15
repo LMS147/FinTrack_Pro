@@ -85,6 +85,10 @@ FinTrack Pro is a personal finance management application for Android designed t
   - [Navigation Component](https://developer.android.com/guide/navigation) for fragment transitions.
   - [Material Design Components](https://material.io/develop/android) for modern UI elements.
   - [Coil](https://coil-kt.github.io/coil/) for image loading.
+  - 
+## Links:
 
+- **OneDrive**: https://advtechonline-my.sharepoint.com/:v:/g/personal/st10436200_rcconnect_edu_za/IQAH2D-HE80xTphpVtvFJOhBAUTGMLaAPKG6-yVzz6ZV_K8?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=5GNMiP
+- **GitHub**: https://github.com/LMS147/FinTrack_Pro
 ---
 Developed for personal finance enthusiasts.
