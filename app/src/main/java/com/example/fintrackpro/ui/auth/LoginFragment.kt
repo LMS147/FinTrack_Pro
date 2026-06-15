@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager2.widget.ViewPager2
+import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentLoginBinding
 
 class LoginFragment : Fragment() {
@@ -31,6 +33,14 @@ class LoginFragment : Fragment() {
             val password = binding.etPassword.text.toString()
             authViewModel.login(email, password)
         }
+
+        binding.tvSwitchToRegister.setOnClickListener {
+            switchToRegister()
+        }
+    }
+
+    private fun switchToRegister() {
+        activity?.findViewById<ViewPager2>(R.id.view_pager)?.currentItem = 1
     }
 
     override fun onDestroyView() {

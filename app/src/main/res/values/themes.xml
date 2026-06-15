@@ -1,20 +1,41 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.FinTrackPro" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="colorSecondary">@color/secondary</item>
+
+        <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/primary_dark</item>
+
+        <!-- Background and Surface colors -->
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorError">@color/expense_red</item>
+
+        <!-- Custom styles -->
+        <item name="materialCardViewStyle">@style/Widget.FinTrackPro.CardView</item>
+        <item name="bottomNavigationStyle">@style/Widget.FinTrackPro.BottomNavigation</item>
+    </style>
+
+    <style name="Widget.FinTrackPro.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="Widget.FinTrackPro.BottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/primary</item>
+        <item name="itemTextColor">@color/primary</item>
+        <item name="backgroundTint">@color/white</item>
     </style>
 
     <style name="Theme.FinTrackPro.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/primary</item>
         <item name="android:statusBarColor">@color/primary</item>
-    </style>
-
-    <style name="Theme.FinTrackPro.NoActionBar" parent="Theme.FinTrackPro">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">

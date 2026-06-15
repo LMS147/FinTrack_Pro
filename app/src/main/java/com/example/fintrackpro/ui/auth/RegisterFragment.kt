@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager2.widget.ViewPager2
+import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentRegisterBinding
 
 class RegisterFragment : Fragment() {
@@ -39,6 +41,14 @@ class RegisterFragment : Fragment() {
 
             authViewModel.register(email, password, fullName)
         }
+
+        binding.tvSwitchToLogin.setOnClickListener {
+            switchToLogin()
+        }
+    }
+
+    private fun switchToLogin() {
+        activity?.findViewById<ViewPager2>(R.id.view_pager)?.currentItem = 0
     }
 
     override fun onDestroyView() {
