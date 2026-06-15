@@ -1,17 +1,19 @@
 # FinTrack Pro
 
-FinTrack Pro is a personal finance management application for Android designed to help users track their expenses, manage budgets, and visualize their spending habits. The app supports multi-user authentication with strict data isolation, ensuring each user's financial information remains private.
+FinTrack Pro is a personal finance management application for Android designed to help users track their expenses, manage budgets, and visualize their spending habits. The app supports multi-user authentication with strict data isolation and includes innovative features like Shared Wallets for collaborative expense tracking.
 
 ## Features
 
 - **User Authentication**: Secure login and registration system with password hashing.
 - **Multi-User Support**: Multiple users can use the app on the same device without seeing each other's data.
-- **Dashboard**: A quick overview of total balance, income, and recent transactions.
+- **Dashboard**: A quick overview of total balance, income, and recent transactions, automatically converted to your preferred currency.
 - **Expense Tracking**: Add and manage transactions with categories, dates, and descriptions.
+- **Shared Wallets**: Create or join collaborative wallets to track shared expenses with other users via invite codes.
+- **Currency Conversion**: Support for multiple currencies (ZAR, USD, EUR, etc.) with real-time conversion for balances and reports.
 - **Receipt Attachments**: Capture or select photos of receipts to attach to expenses.
 - **Budget Management**: Set monthly spending goals and monitor progress with real-time progress bars.
 - **Visual Reports**: View a breakdown of spending by category using interactive pie charts.
-- **Profile Management**: Customize display name, email, and default currency (ZAR, USD, EUR).
+- **Profile Management**: Customize display name, email, and preferred currency (Default: ZAR).
 
 ## Getting Started
 
@@ -33,42 +35,43 @@ FinTrack Pro is a personal finance management application for Android designed t
 ### 1. Registration & Login
 - When you first open the app, you will be directed to the **Login** screen.
 - If you don't have an account, tap **"Register here"**.
-- Fill in your details (Display Name, Username, Email, Password) and select your **Default Currency**.
+- Fill in your details (Full Name, Email, Password). The app defaults to **ZAR** as your currency.
 - After registering, log in with your credentials.
 
 ### 2. Dashboard
 - Upon logging in, you'll see the **Dashboard**.
-- View your **Total Balance**, **Total Income**, and **Total Expenses**.
-- The **Recent Transactions** list shows your last few entries.
+- View your **Total Balance**, **Monthly Income**, and **Monthly Expenses**. 
+- All amounts on the dashboard are automatically converted to your preferred currency selected in Settings.
 - Tap the **Floating Action Button (+)** to quickly add a new transaction.
 
-### 3. Adding Expenses
+### 3. Shared Wallets
+- Navigate to the **Shared Wallets** section.
+- **Create** a new wallet and share the generated **Invite Code** with friends or family.
+- **Join** a wallet by entering an invite code shared with you.
+- Balances in shared wallets are tracked collectively and visible to all members.
+
+### 4. Adding Accounts & Expenses
+- Go to the **Accounts** tab to manage different bank accounts or cash wallets.
 - On the **Add Expense** screen, enter the amount and description.
 - Select a **Category** from the dropdown.
 - Pick a **Date** and optional **Start/End Times**.
-- Tap the **Camera** or **Gallery** icons to attach a receipt photo.
 - Toggle the **Income** chip if the transaction is an income.
-- Tap **Save** to add the transaction.
 
-### 4. Setting Budgets
+### 5. Setting Budgets
 - Navigate to the **Budget** tab from the bottom navigation.
 - Tap **"Set Monthly Budget"**.
-- Use the sliders to set your **Minimum Spending Goal** and **Maximum Spending Goal**.
-- Tap **Save Budget**. The budget screen will now show a progress bar indicating how much of your maximum goal you have spent.
+- Set your spending goals and tap **Save**. The progress bar will indicate how much of your budget is remaining.
 
-### 5. Viewing Reports
+### 6. Viewing Reports
 - Navigate to the **Reports** tab.
 - View a **Pie Chart** summarizing your spending across different categories.
-- You can filter the report by selecting a **Start Date** and **End Date**.
-- A detailed breakdown list is provided below the chart.
+- Filter by date range to see specific spending habits.
 
-### 6. Profile & Settings
-- Navigate to the **Profile** tab.
-- Tap on your **Profile Picture** to update it.
-- Tap **Edit Profile** to change your name or email.
-- Tap **Default Currency** to switch between ZAR, USD, and EUR.
-- Toggle **Notifications** or **Biometrics** (Note: these are UI placeholders for future implementation).
-- Tap **Logout** to securely end your session and return to the login screen.
+### 7. Profile & Settings
+- Navigate to the **Settings** screen (accessible via the profile icon on the Dashboard).
+- Tap **Select Currency** to change your preferred display currency (ZAR, USD, EUR, etc.).
+- Balances across the app will update immediately to reflect the new currency conversion.
+- Tap **Logout** to securely end your session.
 
 ## Technical Details
 
@@ -76,11 +79,12 @@ FinTrack Pro is a personal finance management application for Android designed t
 - **UI Framework**: Android ViewBinding, XML Layouts
 - **Database**: Room (Local SQLite) with KSP
 - **Architecture**: MVVM (Model-ViewModel-View)
-- **Networking**: N/A (Offline-first architecture)
+- **Networking**: N/A (Offline-first architecture with mock exchange rates)
 - **External Libraries**: 
   - [MPAndroidChart](https://github.com/PhilJay/MPAndroidChart) for data visualization.
-  - Navigation Component for fragment transitions.
-  - Material Design Components for modern UI elements.
+  - [Navigation Component](https://developer.android.com/guide/navigation) for fragment transitions.
+  - [Material Design Components](https://material.io/develop/android) for modern UI elements.
+  - [Coil](https://coil-kt.github.io/coil/) for image loading.
 
 ---
 Developed for personal finance enthusiasts.
