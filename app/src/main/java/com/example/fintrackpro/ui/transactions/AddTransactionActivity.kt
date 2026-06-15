@@ -75,6 +75,13 @@ class AddTransactionActivity : AppCompatActivity() {
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerType.adapter = typeAdapter
 
+        binding.spinnerType.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                updateCategorySpinner()
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
+
         viewModel.accounts.observe(this) { accounts ->
             val accountNames = accounts.map { it.accountName }
             val accountAdapter = ArrayAdapter(
@@ -86,16 +93,35 @@ class AddTransactionActivity : AppCompatActivity() {
             binding.spinnerAccount.adapter = accountAdapter
         }
 
-        viewModel.expenseCategories.observe(this) { categories ->
-            val categoryNames = categories.map { it.name }
-            val categoryAdapter = ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                categoryNames
-            )
-            categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinnerCategory.adapter = categoryAdapter
+        viewModel.expenseCategories.observe(this) { 
+            if (binding.spinnerType.selectedItem?.toString() == "EXPENSE") {
+                updateCategorySpinner()
+            }
         }
+
+        viewModel.incomeCategories.observe(this) {
+            if (binding.spinnerType.selectedItem?.toString() == "INCOME") {
+                updateCategorySpinner()
+            }
+        }
+    }
+
+    private fun updateCategorySpinner() {
+        val type = binding.spinnerType.selectedItem?.toString() ?: "EXPENSE"
+        val categories = if (type == "EXPENSE") {
+            viewModel.expenseCategories.value ?: emptyList()
+        } else {
+            viewModel.incomeCategories.value ?: emptyList()
+        }
+
+        val categoryNames = categories.map { it.name }
+        val categoryAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            categoryNames
+        )
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerCategory.adapter = categoryAdapter
     }
 
     private fun setupClickListeners() {

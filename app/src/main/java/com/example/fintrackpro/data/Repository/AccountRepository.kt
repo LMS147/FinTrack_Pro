@@ -23,6 +23,8 @@ class AccountRepository(private val accountDao: AccountDao) {
 
     fun getTotalBalance(userId: String): LiveData<Double?> = accountDao.getTotalBalance(userId)
 
+    suspend fun getTotalBalanceSync(userId: String): Double? = accountDao.getTotalBalanceSync(userId)
+
     suspend fun updateAccountBalance(accountId: String, newBalance: Double) {
         accountDao.updateAccountBalance(accountId, newBalance, System.currentTimeMillis())
     }

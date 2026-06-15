@@ -20,6 +20,7 @@ class FinTrackApp : Application() {
     val achievementRepository by lazy { AchievementRepository(database.achievementDao()) }
     val savingsGoalRepository by lazy { SavingsGoalRepository(database.savingsGoalDao()) }
     val currencyRepository by lazy { CurrencyRepository(database.currencyRateDao()) }
+    val achievementManager by lazy { com.example.fintrackpro.utils.AchievementManager(achievementRepository, transactionRepository, accountRepository) }
 
     override fun onCreate() {
         super.onCreate()

@@ -20,6 +20,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     private val accountRepository: AccountRepository = app.accountRepository
     private val categoryRepository: CategoryRepository = app.categoryRepository
     private val budgetRepository: BudgetRepository = app.budgetRepository
+    private val achievementManager = app.achievementManager
     private val sessionManager = SessionManager(application)
 
     private val _userId = MutableLiveData<String>().apply {
@@ -85,6 +86,8 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
                 if (type == "EXPENSE") {
                     updateBudgetSpent(currentUserId, categoryId, amount)
                 }
+
+                achievementManager.checkTransactionAchievements(currentUserId, amount, type)
 
                 _saveState.value = SaveState.Success
             } catch (e: Exception) {

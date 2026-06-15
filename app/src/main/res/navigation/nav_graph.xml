@@ -29,4 +29,9 @@
         android:name="com.example.fintrackpro.ui.more.MoreFragment"
         android:label="More" />
 
+    <activity
+        android:id="@+id/achievementsActivity"
+        android:name="com.example.fintrackpro.ui.gamification.AchievementsActivity"
+        android:label="Achievements" />
+
 </navigation>

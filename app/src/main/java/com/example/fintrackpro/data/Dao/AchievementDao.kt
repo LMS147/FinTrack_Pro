@@ -18,9 +18,15 @@ interface AchievementDao {
     @Query("SELECT * FROM achievements WHERE userId = :userId ORDER BY isUnlocked DESC, points DESC")
     fun getAchievementsByUser(userId: String): LiveData<List<AchievementEntity>>
 
+    @Query("SELECT * FROM achievements WHERE userId = :userId")
+    suspend fun getAchievementsByUserSync(userId: String): List<AchievementEntity>
+
     @Query("SELECT * FROM achievements WHERE userId = :userId AND isUnlocked = 1")
     fun getUnlockedAchievements(userId: String): LiveData<List<AchievementEntity>>
 
     @Query("SELECT SUM(points) FROM achievements WHERE userId = :userId AND isUnlocked = 1")
     fun getTotalPoints(userId: String): LiveData<Int?>
+
+    @Query("SELECT COUNT(*) FROM achievements WHERE userId = :userId")
+    suspend fun getAchievementCount(userId: String): Int
 }

@@ -27,6 +27,9 @@ interface AccountDao {
     @Query("SELECT SUM(balance) FROM accounts WHERE userId = :userId AND isActive = 1")
     fun getTotalBalance(userId: String): LiveData<Double?>
 
+    @Query("SELECT SUM(balance) FROM accounts WHERE userId = :userId AND isActive = 1")
+    suspend fun getTotalBalanceSync(userId: String): Double?
+
     @Query("UPDATE accounts SET balance = :newBalance, updatedAt = :timestamp WHERE accountId = :accountId")
     suspend fun updateAccountBalance(accountId: String, newBalance: Double, timestamp: Long)
 }

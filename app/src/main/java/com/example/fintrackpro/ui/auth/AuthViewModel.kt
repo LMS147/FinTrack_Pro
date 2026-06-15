@@ -61,6 +61,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 val user = result.getOrNull()!!
                 sessionManager.saveUserId(user.userId)
                 
+                val app = getApplication<com.example.fintrackpro.FinTrackApp>()
+                
                 // Create a default account for the new user
                 val defaultAccount = com.example.fintrackpro.data.entity.AccountEntity(
                     userId = user.userId,
@@ -70,7 +72,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     currency = "ZAR",
                     color = "#2196F3"
                 )
-                (getApplication() as com.example.fintrackpro.FinTrackApp).accountRepository.insertAccount(defaultAccount)
+                app.accountRepository.insertAccount(defaultAccount)
+
+                // Initialize achievements for the new user
+                app.achievementRepository.initializeAchievementsForUser(user.userId)
 
                 _authState.value = AuthState.Success(user)
             } else {

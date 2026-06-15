@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentMoreBinding
 import com.example.fintrackpro.ui.gamification.AchievementsActivity
 import com.example.fintrackpro.ui.reports.ReportsActivity
@@ -42,7 +44,7 @@ class MoreFragment : Fragment() {
         }
 
         binding.btnAchievements.setOnClickListener {
-            startActivity(Intent(requireContext(), AchievementsActivity::class.java))
+            findNavController().navigate(R.id.achievementsActivity)
         }
 
         binding.btnSettings.setOnClickListener {

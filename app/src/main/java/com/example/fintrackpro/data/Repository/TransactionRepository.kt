@@ -68,6 +68,14 @@ class TransactionRepository(private val transactionDao: TransactionDao) {
         return transactionDao.getRecentTransactions(userId, limit)
     }
 
+    suspend fun getRecentTransactionsSync(userId: String, startDate: Long): List<TransactionEntity> {
+        return transactionDao.getRecentTransactionsSync(userId, startDate)
+    }
+
+    suspend fun getExpenseCountSync(userId: String): Int {
+        return transactionDao.getExpenseCountSync(userId)
+    }
+
     fun getCategorySpendingTotals(userId: String, startDate: Long, endDate: Long) =
         transactionDao.getCategorySpendingTotals(userId, startDate, endDate)
 

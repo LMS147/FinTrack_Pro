@@ -68,4 +68,9 @@ interface TransactionDao {
 
     @Delete
     suspend fun deletePhoto(photo: com.example.fintrackpro.data.entity.ExpensePhoto)
+    @Query("SELECT * FROM transactions WHERE userId = :userId AND date >= :startDate ORDER BY date DESC")
+    suspend fun getRecentTransactionsSync(userId: String, startDate: Long): List<TransactionEntity>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE userId = :userId AND type = 'EXPENSE'")
+    suspend fun getExpenseCountSync(userId: String): Int
 }
