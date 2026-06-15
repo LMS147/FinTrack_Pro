@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fintrackpro.data.entity.SharedWalletEntity
 import com.example.fintrackpro.databinding.ItemSharedWalletBinding
-import java.text.NumberFormat
+import com.example.fintrackpro.utils.FormatUtils
 import java.util.*
 
 class SharedWalletAdapter(private val onInviteClick: (String) -> Unit) : 
@@ -27,8 +27,7 @@ class SharedWalletAdapter(private val onInviteClick: (String) -> Unit) :
             binding.tvWalletName.text = wallet.name
             binding.tvDescription.text = wallet.description ?: "No description"
             
-            val formatter = NumberFormat.getCurrencyInstance(Locale.US)
-            binding.tvBalance.text = formatter.format(wallet.totalBalance)
+            binding.tvBalance.text = FormatUtils.formatCurrency(wallet.totalBalance, wallet.currency)
             
             binding.tvInviteCode.text = "Code: ${wallet.inviteCode}"
             binding.tvInviteCode.setOnClickListener { onInviteClick(wallet.inviteCode) }

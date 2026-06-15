@@ -32,7 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
-                app:title="@string/dashboard" />
+                app:title="FinTrack Pro"
+                app:subtitle="Welcome back!" />
 
             <!-- Total Balance Card -->
             <com.google.android.material.card.MaterialCardView

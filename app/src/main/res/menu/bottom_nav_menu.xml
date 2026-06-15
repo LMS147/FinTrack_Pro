@@ -2,26 +2,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/dashboardFragment"
-        android:icon="@android:drawable/ic_dialog_info"
-        android:title="@string/dashboard" />
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dashboard" />
 
     <item
         android:id="@+id/transactionsFragment"
-        android:icon="@android:drawable/ic_menu_recent_history"
-        android:title="@string/transactions" />
+        android:icon="@drawable/ic_transactions"
+        android:title="Transactions" />
 
     <item
         android:id="@+id/budgetsFragment"
-        android:icon="@android:drawable/ic_menu_agenda"
-        android:title="@string/budgets" />
+        android:icon="@drawable/ic_budget"
+        android:title="Budgets" />
 
     <item
         android:id="@+id/accountsFragment"
-        android:icon="@android:drawable/ic_menu_view"
-        android:title="@string/accounts" />
+        android:icon="@drawable/ic_account_circle"
+        android:title="Accounts" />
 
     <item
         android:id="@+id/moreFragment"
-        android:icon="@android:drawable/ic_menu_more"
-        android:title="@string/more" />
+        android:icon="@drawable/ic_description"
+        android:title="More" />
 </menu>

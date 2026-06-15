@@ -6,10 +6,16 @@ import java.util.*
 
 object FormatUtils {
 
-    fun formatCurrency(amount: Double, currency: String = "USD"): String {
-        val format = NumberFormat.getCurrencyInstance(Locale.US)
-        format.currency = Currency.getInstance(currency)
-        return format.format(amount)
+    var defaultCurrency: String = "USD"
+
+    fun formatCurrency(amount: Double, currency: String = defaultCurrency): String {
+        return try {
+            val format = NumberFormat.getCurrencyInstance(Locale.US)
+            format.currency = Currency.getInstance(currency)
+            format.format(amount)
+        } catch (e: Exception) {
+            "$currency ${String.format("%.2f", amount)}"
+        }
     }
 
     fun formatDate(timestamp: Long, pattern: String = "MMM dd, yyyy"): String {

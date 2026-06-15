@@ -13,11 +13,18 @@ class CurrencyRepository(private val currencyRateDao: CurrencyRateDao) {
         if (from == to) return amount
         
         val rate = currencyRateDao.getCurrencyRate(from, to)
-        return if (rate != null) {
-            amount * rate.rate
-        } else {
-            amount
+        if (rate != null) return amount * rate.rate
+        
+        val inverseRate = currencyRateDao.getCurrencyRate(to, from)
+        if (inverseRate != null) return amount / inverseRate.rate
+        
+        // If no direct or inverse rate, try through USD
+        if (from != "USD" && to != "USD") {
+            val fromToUsd = convertCurrency(amount, from, "USD")
+            return convertCurrency(fromToUsd, "USD", to)
         }
+        
+        return amount
     }
 
     suspend fun getAllCurrencyRates() = currencyRateDao.getAllCurrencyRates()

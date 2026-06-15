@@ -9,5 +9,10 @@ data class TransactionWithCategory(
         parentColumn = "categoryId",
         entityColumn = "categoryId"
     )
-    val category: CategoryEntity
+    val category: CategoryEntity,
+    @Relation(
+        parentColumn = "accountId",
+        entityColumn = "accountId"
+    )
+    val account: AccountEntity
 )

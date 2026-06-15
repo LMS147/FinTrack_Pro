@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.fintrackpro.FinTrackApp
 import com.example.fintrackpro.databinding.ActivitySettingsBinding
 import com.example.fintrackpro.ui.auth.AuthActivity
+import com.example.fintrackpro.utils.FormatUtils
 import com.example.fintrackpro.utils.SessionManager
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,11 @@ class SettingsActivity : AppCompatActivity() {
         setupToolbar()
         setupClickListeners()
         loadUserProfile()
+        loadSettings()
+    }
+
+    private fun loadSettings() {
+        binding.tvSelectedCurrency.text = sessionManager.getCurrency()
     }
 
     private fun setupToolbar() {
@@ -107,7 +113,8 @@ class SettingsActivity : AppCompatActivity() {
             .setItems(currencies) { _, which ->
                 val selected = currencies[which]
                 binding.tvSelectedCurrency.text = selected
-                // Here you would normally save this to Preferences
+                sessionManager.saveCurrency(selected)
+                FormatUtils.defaultCurrency = selected
                 Toast.makeText(this, "Currency set to $selected", Toast.LENGTH_SHORT).show()
             }
             .show()

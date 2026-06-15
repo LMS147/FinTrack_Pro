@@ -7,10 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.fintrackpro.FinTrackApp
+import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.FragmentDashboardBinding
 import com.example.fintrackpro.ui.transactions.AddTransactionActivity
 import com.example.fintrackpro.utils.FormatUtils
+import com.example.fintrackpro.utils.SessionManager
+import kotlinx.coroutines.launch
 
 class DashboardFragment : Fragment() {
 
@@ -31,9 +39,24 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         setupRecyclerView()
         observeData()
         setupClickListeners()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.inflateMenu(R.menu.dashboard_menu)
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_profile -> {
+                    // Navigate to settings which has profile info
+                    findNavController().navigate(R.id.moreFragment)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -45,6 +68,20 @@ class DashboardFragment : Fragment() {
     }
 
     private fun observeData() {
+        val sessionManager = SessionManager(requireContext())
+        val userId = sessionManager.getUserId()
+        if (userId != null) {
+            val repository = (requireActivity().application as FinTrackApp).userRepository
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    val user = repository.getUserById(userId)
+                    if (user != null) {
+                        binding.toolbar.subtitle = "Hi, ${user.fullName.split(" ")[0]}!"
+                    }
+                }
+            }
+        }
+
         viewModel.totalBalance.observe(viewLifecycleOwner) { balance ->
             binding.tvTotalBalance.text = FormatUtils.formatCurrency(balance ?: 0.0)
         }
@@ -61,7 +98,7 @@ class DashboardFragment : Fragment() {
             binding.tvMonthlySavings.text = FormatUtils.formatCurrency(savings)
         }
 
-        viewModel.recentTransactions.observe(viewLifecycleOwner) { transactions ->
+        viewModel.convertedRecentTransactions.observe(viewLifecycleOwner) { transactions ->
             if (transactions.isNullOrEmpty()) {
                 binding.tvEmptyState.visibility = View.VISIBLE
                 binding.rvRecentTransactions.visibility = View.GONE

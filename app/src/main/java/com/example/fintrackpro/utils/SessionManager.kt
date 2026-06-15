@@ -18,6 +18,14 @@ class SessionManager(context: Context) {
         return prefs.getString(KEY_USER_ID, null)
     }
 
+    fun saveCurrency(currencyCode: String) {
+        prefs.edit().putString(KEY_CURRENCY, currencyCode).apply()
+    }
+
+    fun getCurrency(): String {
+        return prefs.getString(KEY_CURRENCY, "USD") ?: "USD"
+    }
+
     fun isLoggedIn(): Boolean {
         return getUserId() != null
     }
@@ -29,5 +37,6 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREF_NAME = "FinTrackSession"
         private const val KEY_USER_ID = "user_id"
+        private const val KEY_CURRENCY = "currency_code"
     }
 }

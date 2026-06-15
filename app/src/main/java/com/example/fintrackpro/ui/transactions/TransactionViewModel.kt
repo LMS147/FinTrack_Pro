@@ -20,6 +20,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     private val accountRepository: AccountRepository = app.accountRepository
     private val categoryRepository: CategoryRepository = app.categoryRepository
     private val budgetRepository: BudgetRepository = app.budgetRepository
+    private val currencyRepository = app.currencyRepository
     private val achievementManager = app.achievementManager
     private val sessionManager = SessionManager(application)
 
@@ -29,6 +30,23 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
 
     val transactions: LiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>> = _userId.switchMap { id ->
         transactionRepository.getTransactionsByUser(id)
+    }
+
+    val convertedTransactions: LiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>> = MediatorLiveData<List<com.example.fintrackpro.data.entity.TransactionWithCategory>>().apply {
+        addSource(transactions) { list ->
+            viewModelScope.launch {
+                val targetCurrency = sessionManager.getCurrency()
+                val convertedList = list.map { item ->
+                    val convertedAmount = currencyRepository.convertCurrency(
+                        item.transaction.amount,
+                        item.account.currency,
+                        targetCurrency
+                    )
+                    item.copy(transaction = item.transaction.copy(amount = convertedAmount))
+                }
+                value = convertedList
+            }
+        }
     }
 
     val accounts: LiveData<List<AccountEntity>> = _userId.switchMap { id ->

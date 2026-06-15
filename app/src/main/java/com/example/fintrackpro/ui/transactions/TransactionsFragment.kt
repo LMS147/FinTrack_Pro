@@ -44,7 +44,7 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun observeData() {
-        viewModel.transactions.observe(viewLifecycleOwner) { transactions ->
+        viewModel.convertedTransactions.observe(viewLifecycleOwner) { transactions ->
             transactionAdapter.submitList(transactions)
         }
     }

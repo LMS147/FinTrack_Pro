@@ -6,6 +6,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.fintrackpro.R
 import com.example.fintrackpro.databinding.ActivityMainBinding
+import com.example.fintrackpro.utils.FormatUtils
+import com.example.fintrackpro.utils.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -14,6 +16,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val sessionManager = SessionManager(this)
+        FormatUtils.defaultCurrency = sessionManager.getCurrency()
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
