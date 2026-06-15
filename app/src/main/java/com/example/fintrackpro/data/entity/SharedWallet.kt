@@ -25,7 +25,7 @@ data class SharedWalletEntity(
     val name: String,
     val description: String? = null,
     val totalBalance: Double = 0.0,
-    val currency: String = "USD",
+    val currency: String = "ZAR",
     val memberIds: String, // Comma-separated user IDs
     val inviteCode: String = UUID.randomUUID().toString().substring(0, 8),
     val createdAt: Long = System.currentTimeMillis(),

@@ -135,4 +135,8 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             value = income - expenses
         }
     }
+
+    fun refreshCurrency() {
+        appCurrency.value = sessionManager.getCurrency()
+    }
 }

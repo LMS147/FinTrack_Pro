@@ -107,7 +107,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showCurrencyDialog() {
-        val currencies = arrayOf("USD", "EUR", "GBP", "INR", "ZAR", "JPY", "CNY")
+        val currencies = arrayOf("ZAR", "USD", "EUR", "GBP", "INR", "JPY", "CNY")
         AlertDialog.Builder(this)
             .setTitle("Select Currency")
             .setItems(currencies) { _, which ->

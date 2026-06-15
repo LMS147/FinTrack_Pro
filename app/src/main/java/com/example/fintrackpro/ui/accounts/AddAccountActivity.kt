@@ -44,7 +44,7 @@ class AddAccountActivity : AppCompatActivity() {
         val currencyAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
-            listOf("USD", "EUR", "GBP", "INR", "JPY", "CNY", "AUD", "CAD")
+            listOf("ZAR", "USD", "EUR", "GBP", "INR", "JPY", "CNY", "AUD", "CAD")
         )
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCurrency.adapter = currencyAdapter

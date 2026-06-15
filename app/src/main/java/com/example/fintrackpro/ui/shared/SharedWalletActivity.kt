@@ -54,10 +54,15 @@ class SharedWalletActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.sharedWallets.observe(this) { wallets ->
+        viewModel.convertedWallets.observe(this) { wallets ->
             adapter.submitList(wallets)
             binding.tvEmptyState.visibility = if (wallets.isEmpty()) View.VISIBLE else View.GONE
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshCurrency()
     }
 
     private fun showCreateWalletDialog() {

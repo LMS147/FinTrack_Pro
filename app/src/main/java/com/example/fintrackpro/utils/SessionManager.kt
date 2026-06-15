@@ -23,7 +23,7 @@ class SessionManager(context: Context) {
     }
 
     fun getCurrency(): String {
-        return prefs.getString(KEY_CURRENCY, "USD") ?: "USD"
+        return prefs.getString(KEY_CURRENCY, "ZAR") ?: "ZAR"
     }
 
     fun isLoggedIn(): Boolean {

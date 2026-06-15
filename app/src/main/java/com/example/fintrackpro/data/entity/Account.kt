@@ -25,7 +25,7 @@ data class AccountEntity(
     val accountName: String,
     val accountType: String, // BANK, CASH, CREDIT_CARD, INVESTMENT
     val balance: Double = 0.0,
-    val currency: String = "USD",
+    val currency: String = "ZAR",
     val color: String = "#2196F3",
     val icon: String = "account_balance",
     val isActive: Boolean = true,

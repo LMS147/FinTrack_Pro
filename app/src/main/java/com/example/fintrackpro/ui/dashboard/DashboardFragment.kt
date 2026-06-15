@@ -45,6 +45,11 @@ class DashboardFragment : Fragment() {
         setupClickListeners()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshCurrency()
+    }
+
     private fun setupToolbar() {
         binding.toolbar.inflateMenu(R.menu.dashboard_menu)
         binding.toolbar.setOnMenuItemClickListener { item ->

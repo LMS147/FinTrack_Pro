@@ -3,6 +3,7 @@ package com.example.fintrackpro.ui.accounts
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.fintrackpro.FinTrackApp
@@ -19,6 +20,45 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
     private val userId: String = sessionManager.getUserId() ?: ""
 
     val accounts: LiveData<List<AccountEntity>> = accountRepository.getAccountsByUser(userId)
+
+    val appCurrency = MutableLiveData<String>().apply {
+        value = sessionManager.getCurrency()
+    }
+
+    private val currencyRepository = (application as FinTrackApp).currencyRepository
+
+    val convertedAccounts: LiveData<List<AccountEntity>> = MediatorLiveData<List<AccountEntity>>().apply {
+        var currentAccounts: List<AccountEntity>? = null
+        var currentCurrency: String = sessionManager.getCurrency()
+
+        fun update() {
+            val accs = currentAccounts ?: return
+            viewModelScope.launch {
+                val converted = accs.map { account ->
+                    val convertedBalance = currencyRepository.convertCurrency(
+                        account.balance,
+                        account.currency,
+                        currentCurrency
+                    )
+                    account.copy(balance = convertedBalance, currency = currentCurrency)
+                }
+                value = converted
+            }
+        }
+
+        addSource(accounts) {
+            currentAccounts = it
+            update()
+        }
+        addSource(appCurrency) {
+            currentCurrency = it
+            update()
+        }
+    }
+
+    fun refreshCurrency() {
+        appCurrency.value = sessionManager.getCurrency()
+    }
 
     private val _saveState = MutableLiveData<SaveState>()
     val saveState: LiveData<SaveState> = _saveState

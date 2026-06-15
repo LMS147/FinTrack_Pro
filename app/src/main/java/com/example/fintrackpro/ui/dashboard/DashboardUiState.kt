@@ -7,7 +7,7 @@ data class DashboardUiState(
     val totalIncome: Double = 0.0,
     val totalExpenses: Double = 0.0,
     val recentTransactions: List<TransactionEntity> = emptyList(),
-    val currency: String = "USD",
+    val currency: String = "ZAR",
     val isLoading: Boolean = true,
     val errorMessage: String? = null
 )

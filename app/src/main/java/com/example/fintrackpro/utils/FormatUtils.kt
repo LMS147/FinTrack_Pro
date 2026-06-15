@@ -6,7 +6,7 @@ import java.util.*
 
 object FormatUtils {
 
-    var defaultCurrency: String = "USD"
+    var defaultCurrency: String = "ZAR"
 
     fun formatCurrency(amount: Double, currency: String = defaultCurrency): String {
         return try {

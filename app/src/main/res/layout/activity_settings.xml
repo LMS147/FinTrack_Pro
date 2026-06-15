@@ -112,7 +112,7 @@
                             android:id="@+id/tvSelectedCurrency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="USD"
+                            android:text="ZAR"
                             android:textColor="?android:attr/textColorSecondary" />
 
                     </LinearLayout>

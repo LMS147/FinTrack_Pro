@@ -26,7 +26,7 @@ data class SavingsGoalEntity(
     val description: String? = null,
     val targetAmount: Double,
     val currentAmount: Double = 0.0,
-    val currency: String = "USD",
+    val currency: String = "ZAR",
     val targetDate: Long,
     val icon: String = "savings",
     val color: String = "#4CAF50",

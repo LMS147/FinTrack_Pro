@@ -43,9 +43,14 @@ class AccountsFragment : Fragment() {
     }
 
     private fun observeData() {
-        viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+        viewModel.convertedAccounts.observe(viewLifecycleOwner) { accounts ->
             accountAdapter.submitList(accounts)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshCurrency()
     }
 
     private fun setupClickListeners() {

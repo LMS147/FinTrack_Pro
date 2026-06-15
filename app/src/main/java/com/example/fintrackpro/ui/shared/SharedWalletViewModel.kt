@@ -24,6 +24,45 @@ class SharedWalletViewModel(application: Application) : AndroidViewModel(applica
         repository.getSharedWalletsByUser(id)
     }
 
+    val appCurrency = MutableLiveData<String>().apply {
+        value = sessionManager.getCurrency()
+    }
+
+    private val currencyRepository = (application as FinTrackApp).currencyRepository
+
+    val convertedWallets: LiveData<List<SharedWalletEntity>> = androidx.lifecycle.MediatorLiveData<List<SharedWalletEntity>>().apply {
+        var currentWallets: List<SharedWalletEntity>? = null
+        var currentCurrency: String = sessionManager.getCurrency()
+
+        fun update() {
+            val wallets = currentWallets ?: return
+            viewModelScope.launch {
+                val converted = wallets.map { wallet ->
+                    val convertedBalance = currencyRepository.convertCurrency(
+                        wallet.totalBalance,
+                        wallet.currency,
+                        currentCurrency
+                    )
+                    wallet.copy(totalBalance = convertedBalance, currency = currentCurrency)
+                }
+                value = converted
+            }
+        }
+
+        addSource(sharedWallets) {
+            currentWallets = it
+            update()
+        }
+        addSource(appCurrency) {
+            currentCurrency = it
+            update()
+        }
+    }
+
+    fun refreshCurrency() {
+        appCurrency.value = sessionManager.getCurrency()
+    }
+
     fun createSharedWallet(name: String, description: String?) {
         val ownerId = _userId.value ?: return
         viewModelScope.launch {
